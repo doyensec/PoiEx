@@ -1,0 +1,12 @@
+rules:
+  - id: iac-poi-boto3_s3_put_obj
+    languages:
+      - python
+    severity: WARNING
+    message: "IaC Point Of Intersection: S3 Bucket put_object"
+    patterns:
+      - pattern-either:
+        - pattern: $W.Bucket(...).put_object(...)
+        - pattern: |
+            $B = $W.Bucket(...)
+            $B.put_object(...)

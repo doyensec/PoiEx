@@ -1,0 +1,38 @@
+rules:
+  - id: js-gcp-generic1
+    pattern-either:
+      - patterns:
+          - pattern-inside: |
+              $V2 = require("$SN").v1.$V;
+              ...
+          - pattern: new $V2(...)
+          - metavariable-regex:
+              metavariable: $SN
+              regex: \@google-cloud/([AZaz\-]*)
+      - patterns:
+          - pattern-inside: |
+              var {$V} = require("$SN").v1;
+              ...
+          - pattern: new $V(...)
+          - metavariable-regex:
+              metavariable: $SN
+              regex: \@google-cloud/([AZaz\-]*)
+      - patterns:
+          - pattern-inside: |
+              $V2 = require("$SN").$V;
+              ...
+          - pattern: new $V2(...)
+          - metavariable-regex:
+              metavariable: $SN
+              regex: \@google-cloud/([AZaz\-]*)
+      - patterns:
+          - pattern-inside: |
+              var {$V} = require("$SN");
+              ...
+          - pattern: new $V(...)
+          - metavariable-regex:
+              metavariable: $SN
+              regex: \@google-cloud/([AZaz\-]*)
+    message: 'IaC Point Of Intersection: google.cloud.$PN.$SN.$F call to GCP SDK $V'
+    languages: [javascript]
+    severity: WARNING

@@ -1,0 +1,11 @@
+rules:
+  - id: hcl-aws-dynamodb
+    patterns:
+      - pattern: |
+          resource "aws_dynamodb_table" $B {
+            ...
+          }
+    message: "IaC Point Of Intersection: definition of $B AWS DynamoDB"
+    languages:
+      - hcl
+    severity: WARNING

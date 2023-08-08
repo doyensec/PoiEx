@@ -1,0 +1,12 @@
+rules:
+  - id: iac-poi-boto3_put_records
+    languages:
+      - python
+    severity: WARNING
+    message: "IaC Point Of Intersection: put_records $B"
+    patterns:
+      - pattern-either:
+        - pattern: boto3.client(...).put_records(...)
+        - pattern: |
+            $B = boto3.client(...)
+            $B.put_records(...)

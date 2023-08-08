@@ -1,0 +1,16 @@
+rules:
+  - id: python-gcp-generic1
+    pattern-either:
+      - patterns:
+          - pattern-inside: |
+              from google.cloud.$PN import $SN
+              ...
+          - pattern: $SN.$F(...)
+      - patterns:
+          - pattern-inside: |
+              import google.cloud.$PN.$SN
+              ...
+          - pattern: google.cloud.$PN.$SN.$F(...)
+    message: 'IaC Point Of Intersection: google.cloud.$PN.$SN.$F call to GCP SDK'
+    languages: [python]
+    severity: WARNING

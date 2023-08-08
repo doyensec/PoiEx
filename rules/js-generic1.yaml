@@ -1,0 +1,25 @@
+rules:
+  - id: js-generic1
+    message: 'IaC Point Of Intersection: $SRV call to AWS SDK'
+    languages:
+      - javascript
+    severity: WARNING
+    pattern-either:
+      - patterns:
+          - pattern-inside: |
+              ... $AWS = require('aws-sdk');
+              ...
+          - pattern: new $AWS.$SRV(...)
+      - patterns:
+          - pattern-inside: |
+              ... $AWS = require('aws-sdk');
+              ...
+          - pattern: new $AWS.$SRV(...)
+      - patterns:
+          - pattern-inside: |
+              ... $SRV = require("$SN");
+              ...
+          - pattern: new $SRV(...)
+          - metavariable-regex:
+              metavariable: "$SN"
+              regex: "^aws-sdk/clients/.*"

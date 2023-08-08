@@ -1,0 +1,11 @@
+rules:
+  - id: hcl-aws-sqs
+    patterns:
+      - pattern: |
+          resource "aws_sqs_queue" $B {
+            ...
+          }
+    message: "IaC Point Of Intersection: definition of $B AWS SQS queue"
+    languages:
+      - hcl
+    severity: WARNING

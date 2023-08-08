@@ -1,0 +1,23 @@
+rules:
+  - id: python-aws-generic1
+    languages:
+      - python
+    severity: WARNING
+    message: "IaC Point Of Intersection: $F call to AWS SDK; SN = $SN"
+    patterns:
+      - pattern-either:
+        - pattern: boto3.client($SN, ...).$F(...)
+        - pattern: |
+            $B = boto3.client($SN, ...)
+            $B.$F(...)
+        - pattern: boto3.resource($SN, ...).$F(...)
+        - pattern: |
+            $B = boto3.resource($SN, ...)
+            $B.$F(...)
+        - patterns:
+          - pattern-inside: |
+              ...
+              $B = boto3.client($SN, ...)
+              ...
+          - pattern: |
+              $B.$F(...)

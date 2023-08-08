@@ -1,0 +1,10 @@
+rules:
+  - id: python-aws-generic2
+    languages:
+      - python
+    severity: WARNING
+    message: "IaC Point Of Intersection: Instantiation of AWS SDK; SN = $SN"
+    patterns:
+      - pattern-either:
+        - pattern: boto3.client($SN, ...)
+        - pattern: boto3.resource($SN, ...)

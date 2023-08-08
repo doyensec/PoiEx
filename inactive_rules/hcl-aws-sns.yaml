@@ -1,0 +1,11 @@
+rules:
+  - id: hcl-aws-sns
+    patterns:
+      - pattern: |
+          resource "aws_sns_topic" $B {
+            ...
+          }
+    message: "IaC Point Of Intersection: definition of $B AWS SNS topic"
+    languages:
+      - hcl
+    severity: WARNING

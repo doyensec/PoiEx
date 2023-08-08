@@ -1,0 +1,11 @@
+rules:
+  - id: hcl-aws-s3-bucket
+    patterns:
+      - pattern: |
+          resource "aws_s3_bucket_object" $B {
+            ...
+          }
+    message: "IaC Point Of Intersection: definition of $B AWS S3 bucket"
+    languages:
+      - hcl
+    severity: WARNING

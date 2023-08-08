@@ -1,0 +1,20 @@
+.poitable {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    line-height: 1.4em;
+    --monaco-monospace-font: "Ubuntu Mono","Liberation Mono","DejaVu Sans Mono","Courier New",monospace;
+    font-family: system-ui,Ubuntu,Droid Sans,sans-serif;
+}
+
+.poitr:hover {
+    background-color: var(--vscode-inputOption-hoverBackground);
+}
+
+.poitd, .poith {
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}

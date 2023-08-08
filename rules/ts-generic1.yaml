@@ -1,0 +1,30 @@
+rules:
+  - id: ts-generic1
+    message: 'IaC Point Of Intersection: $F call to AWS SDK'
+    languages:
+      - typescript
+    severity: WARNING
+    pattern-either:
+      - patterns:
+          - pattern-inside: |
+              import AWS from 'aws-sdk'
+              ...
+          - pattern: new AWS.$F(...)
+      - patterns:
+          - pattern-inside: |
+              import AWS from 'aws-sdk/global'
+              ...
+          - pattern: new AWS.$F(...)
+      - patterns:
+          - pattern-inside: |
+              import * as $A from 'aws-sdk'
+              ...
+          - pattern: new $A.$F(...)
+      - patterns:
+          - pattern-inside: |
+              import $C from "$SN"
+              ...
+          - pattern: new $C.$F(...)
+          - metavariable-regex:
+              metavariable: "$SN"
+              regex: "^aws-sdk/clients/.*"

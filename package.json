@@ -1,0 +1,296 @@
+{
+	"name": "ds-sast",
+	"displayName": "DS-SAST",
+	"description": "DS SAST Extension",
+	"version": "0.0.1",
+	"publisher": "michelelizzit",
+	"contributors": [
+		{
+			"name" : "Michele Lizzit",
+			"email" : "michele@lizzit.it",
+			"url" : "https://lizzit.it/"
+		},
+		{
+			"name" : "Francesco Lacerenza",
+			"email" : "francesco@doyensec.com",
+			"url" : "https://doyensec.com/"
+		}
+	],
+	"engines": {
+		"vscode": "^1.76.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onStartupFinished",
+		"onView:ds-sast"
+	],
+	"extensionDependencies": [
+		"mindaro-dev.file-downloader"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "ds-sast.readSemgrepJson",
+				"title": "Read Semgrep Json"
+			},
+			{
+				"command": "ds-sast.create_note",
+				"title": "Create new comment",
+				"enablement": "!commentIsEmpty"
+			},
+			{
+				"command": "ds-sast.replyNote",
+				"title": "Reply",
+				"enablement": "!commentIsEmpty"
+			},
+			{
+				"command": "ds-sast.editNote",
+				"title": "Edit"
+			},
+			{
+				"command": "ds-sast.deleteNote",
+				"title": "Delete"
+			},
+			{
+				"command": "ds-sast.deleteNoteComment",
+				"title": "Delete"
+			},
+			{
+				"command": "ds-sast.saveNote",
+				"title": "Save"
+			},
+			{
+				"command": "ds-sast.cancelsaveNote",
+				"title": "Cancel"
+			},
+			{
+				"command": "ds-sast.dispose",
+				"title": "Remove All Notes (DANGER)"
+			}
+		],
+		"configuration": {
+			"title": "DS SAST",
+			"properties": {
+				"ds-sast.authorName": {
+					"type": "string",
+					"description": "Author name for comments.",
+					"default": "No-name"
+				},
+				"ds-sast.semgrepArgs": {
+					"type": "string",
+					"description": "Semgrep command line arguments.",
+					"default": "--config auto"
+				},
+				"ds-sast.semgrepTimeout": {
+					"type": "number",
+					"description": "Semgrep execution timeout in seconds.",
+					"default": 240,
+					"minimum": 10,
+					"maximum": 7200
+				},
+				"ds-sast.enableIaC": {
+					"type": "boolean",
+					"description": "Enable IaC-specific features.",
+					"default": false
+				},
+				"ds-sast.inframapPath": {
+					"type": "string",
+					"description": "Path to inframap binary.",
+					"default": ""
+				},
+				"ds-sast.collab.enabled": {
+					"type": "boolean",
+					"description": "Enable collaboration via MongoDB.",
+					"default": false
+				},
+				"ds-sast.collab.uri": {
+					"type": "string",
+					"description": "URI of the remote MongoDB server.",
+					"default": "mongodb://localhost:27017/"
+				},
+				"ds-sast.collab.database": {
+					"type": "string",
+					"description": "Name of the MongoDB database.",
+					"default": "ds-sast"
+				},
+				"ds-sast.collab.expireAfter": {
+					"type": "string",
+					"description": "Auto-delete comments on remote database after a certain amount of seconds. (Set to 0 to disable)",
+					"default": "0"
+				}
+			}
+		},
+		"menus": {
+			"comments/commentThread/title": [
+				{
+					"command": "ds-sast.deleteNote",
+					"group": "navigation",
+					"when": "commentController == ds-sast && !commentThreadIsEmpty"
+				}
+			],
+			"comments/commentThread/context": [
+				{
+					"command": "ds-sast.create_note",
+					"group": "inline",
+					"when": "commentController == ds-sast && commentThreadIsEmpty"
+				},
+				{
+					"command": "ds-sast.replyNote",
+					"group": "inline",
+					"when": "commentController == ds-sast && !commentThreadIsEmpty"
+				}
+			],
+			"comments/comment/title": [
+				{
+					"command": "ds-sast.editNote",
+					"group": "group@1",
+					"when": "commentController == ds-sast"
+				},
+				{
+					"command": "ds-sast.deleteNoteComment",
+					"group": "group@2",
+					"when": "commentController == ds-sast && comment == canDelete"
+				}
+			],
+			"comments/comment/context": [
+				{
+					"command": "ds-sast.cancelsaveNote",
+					"group": "inline@1",
+					"when": "commentController == ds-sast"
+				},
+				{
+					"command": "ds-sast.saveNote",
+					"group": "inline@2",
+					"when": "commentController == ds-sast"
+				}
+			]
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "ds-sast",
+					"title": "DS SAST",
+					"icon": "media/infrastructure.svg"
+				}
+			]
+		},
+		"views": {
+			"ds-sast": [
+				{
+					"id": "iacAudit",
+					"name": "DS SAST - Semgrep",
+					"contextualTitle": "Explore Semgrep Findings"
+				},
+				{
+					"id": "iacProjectManager",
+					"name": "DS SAST - Manage projects",
+					"contextualTitle": "Manage IaC Audit projects"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "iacAudit",
+				"contents": "Automatically run Semgrep on the currently open workspace folder.\n[Run Semgrep on current Workspace](command:ds-sast.runSemgrep)\nManually provide a Semgrep JSON file. Make sure that you run Semgrep relative to the currently open workspace directory.\n[Provide Semgrep Json File](command:ds-sast.readSemgrepJson)\nDelete all findings generated with this extension.\n[Delete all diagnostics](command:ds-sast.deleteAllDiagnostics)",
+				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true"
+			},
+			{
+				"view": "iacAudit",
+				"contents": "Analyze the current project and show IaC-specific diagram.\n[Show IaC diagram](command:ds-sast.showIaCwebview)",
+				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true && config.ds-sast.enableIaC == true"
+			},
+			{
+				"view": "iacAudit",
+				"contents": "Please open a workspace folder to use this extension.",
+				"when": "workspaceFolderCount == 0"
+			},
+			{
+				"view": "iacAudit",
+				"contents": "Please open a project to use this extension.",
+				"when": "workspaceFolderCount > 0 && iacAudit.isProjectOpen == false"
+			},
+			{
+				"view": "iacAudit",
+				"contents": "This extension only works when a single workspace folder is open. Please close all other workspace folders.",
+				"when": "workspaceFolderCount > 1"
+			},
+			{
+				"view": "iacProjectManager",
+				"contents": "Please open a workspace folder to use this extension.",
+				"when": "workspaceFolderCount == 0"
+			},
+			{
+				"view": "iacProjectManager",
+				"contents": "This extension only works when a single workspace folder is open. Please close all other workspace folders.",
+				"when": "workspaceFolderCount > 1"
+			},
+			{
+				"view": "iacProjectManager",
+				"contents": "Initialize a new project on current Workspace.\n[Init project](command:ds-sast.initProject)\nOpen existing project from remote database.\n[Open existing project](command:ds-sast.openProject)",
+				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == false"
+			},
+			{
+				"view": "iacProjectManager",
+				"contents": "Close current project.\n[Close project](command:ds-sast.closeProject)\nExport currently open project to a file.\n[Export project](command:ds-sast.exportProject)\nDestroy current project on local database only.\n[Destroy local project](command:ds-sast.destroyLocalProject)",
+				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true"
+			},
+			{
+				"view": "iacProjectManager",
+				"contents": "Destroy current project on local and remote database.\n[Destroy project](command:ds-sast.destroyProject)",
+				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true && iacAudit.isProjectCreator == true"
+			},
+			{
+				"view": "iacProjectManager",
+				"contents": "Copy encryption key to clipboard.\n[Copy key to clipboard](command:ds-sast.copyKey)",
+				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true && iacAudit.isProjectEncrypted == true"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^8.1.0",
+		"@types/mocha": "^10.0.1",
+		"@types/node": "16.x",
+		"@types/vscode": "^1.76.0",
+		"@typescript-eslint/eslint-plugin": "^5.53.0",
+		"@typescript-eslint/parser": "^5.53.0",
+		"@vscode/test-electron": "^2.2.3",
+		"@vscode/vsce": "^2.19.0",
+		"electron": "^19.1.9",
+		"electron-rebuild": "^3.2.9",
+		"eslint": "^8.34.0",
+		"glob": "^8.1.0",
+		"mocha": "^10.2.0",
+		"typescript": "^4.9.5"
+	},
+	"dependencies": {
+		"@microsoft/vscode-file-downloader-api": "^1.0.1",
+		"@types/sqlite3": "^3.1.8",
+		"@types/ssri": "^7.1.1",
+		"@types/tar": "^6.1.5",
+		"@types/url-parse": "^1.4.8",
+		"@types/which": "^3.0.0",
+		"jose": "^4.14.4",
+		"mongodb": "^5.2.0",
+		"sqlite": "^4.2.1",
+		"sqlite3": "^5.1.6",
+		"ssri": "^10.0.4",
+		"tar": "^6.1.15",
+		"url-parse": "^1.5.10",
+		"which": "^3.0.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/michelelizzit/iac-vscode.git"
+	}
+}

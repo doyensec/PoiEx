@@ -1,0 +1,11 @@
+rules:
+  - id: hcl-resource
+    patterns:
+      - pattern: |
+          resource $RT $RN {
+            ...
+          }
+    message: "IaC resource block: $RT $RN"
+    languages:
+      - hcl
+    severity: WARNING
