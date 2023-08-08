@@ -291,6 +291,6 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/michelelizzit/iac-vscode.git"
+		"url": "https://github.com/doyensec/IaC_PoI_Explorer.git"
 	}
 }
