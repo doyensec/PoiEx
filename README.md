@@ -10,7 +10,43 @@
 </p>
 </br>
 
-To test this extension install Semgrep, then download and install the VSIX extension from GitHub Releases.
+## Try it out!
+
+Download and install the VSIX extension from GitHub Releases. Make sure you have Semgrep installed before running DS-SAST.
+
+## Basic usage
+
+DS-SAST allows users to scan the application code and the IaC definition at the same time, generating results in a nice and user friendly view. Users can navigate the infrastructure diagram and quickly jump to the relevant application code sections where the selected infrastructure resource is used. Additionally, DS-SAST provides for advanced collaborations capabilities, notes taking using the VS Code Comments API and integration with Semgrep, allowing DS-SAST to be used also as a standalone Semgrep extension without any of the IaC-specific features.
+
+### IaC Diagrams
+
+### IaC - App linking
+
+### Semgrep integration
+
+![Semgrep integration](images/feature-findings.png)
+*Integration with Semgrep*
+
+### Notes taking
+
+![Collaborative comments](images/feature-comments.png)
+*Collaborative comments*
+
+## Local database
+When collaboration mode is disabled, each project is stored in a local SQLite database. In this mode, projects are not synchronized or shared across different collaborators.
+
+## Collaboration mode
+DS-SAST allows for real-time synchronization of findings and comments with other users. This mode requires a MongoDB instance shared across all collaborators.  
+Set your name in _Settings > Estensions > DS-SAST > Author Name_ and the database URI. See section below for how to deploy a MongoDB instance.
+
+<h1 align="center">
+  <sub>
+    <img src="images/logo-1.png" height="48" alt="icon">
+  </sub>
+  <sup>
+    &nbsp;DS-SAST
+  </sup>
+</h1>
 
 ## Features
 
@@ -34,12 +70,6 @@ To test this extension install Semgrep, then download and install the VSIX exten
 * Visualize Inframap output
 * Match Semgrep HCL findings with their respective resource
 * Interactive diagram that links PoIs and findings with their respective diagram entity
-
-![Collaborative comments](images/feature-comments.png)
-*Collaborative comments*
-
-![Semgrep integration](images/feature-findings.png)
-*Integration with Semgrep*
 
 ## TODO:
  * Add support for reactions
