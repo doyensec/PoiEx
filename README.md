@@ -20,7 +20,13 @@ DS-SAST allows users to scan the application code and the IaC definition at the 
 
 ### IaC Diagrams
 
-### IaC - App linking
+![IaC Diagrams](images/feature-diagram.png)
+*IaC Diagrams*
+
+### IaC - App Linking
+
+![IaC - App Linking](images/feature-poi.png)
+*IaC - App Linking*
 
 ### Semgrep integration
 
