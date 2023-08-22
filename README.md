@@ -129,7 +129,7 @@ mongosh -u "$ADMIN_USERNAME" -p "$ADMIN_PASSWORD" --authenticationDatabase "admi
 mongosh -u "$ADMIN_USERNAME" -p "$ADMIN_PASSWORD" --authenticationDatabase "admin" <<< "var x = rs.conf(); x.members[0].host = \"$FQDN:27017\"; rs.reconfig(x);"
 ```
 
-After deployment create additional user(s) for the extension collaborators.
+After deployment create additional user(s) for the extension collaborators. Each user should have read/write access to one common database. Each collaborator should enter the same MongoDB URI, and database name in the extension settings.
 
 ## Extension Settings
 

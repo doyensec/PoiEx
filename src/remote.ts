@@ -452,7 +452,7 @@ export class RemoteDB {
         return [projects, deletedProjects];
     }
 
-    async pushProject(uuid: string, name: string, keys: string | null, deleted: boolean): Promise<boolean> {
+    async pushProject(uuid: string, name: string, jwt: string | null, deleted: boolean): Promise<boolean> {
         assert(this.dbName !== null);
         if (this.dbName === null) { return false; }
         if (!this.isRemoteReady()) { return false; }
@@ -462,7 +462,7 @@ export class RemoteDB {
 
         const db = client.db(this.dbName);
         const collection = db.collection(constants.PROJECT_DIR_COLLECTION);
-        await collection.updateOne({ uuid: uuid }, { $set: { name: name, keys: keys, deleted: deleted, uuid: uuid } }, { upsert: true });
+        await collection.updateOne({ uuid: uuid }, { $set: { name: name, jwt: jwt, deleted: deleted, uuid: uuid } }, { upsert: true });
 
         await client.close();
         return true;

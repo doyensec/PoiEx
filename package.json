@@ -6,14 +6,14 @@
 	"publisher": "michelelizzit",
 	"contributors": [
 		{
-			"name" : "Michele Lizzit",
-			"email" : "michele@lizzit.it",
-			"url" : "https://lizzit.it/"
+			"name": "Michele Lizzit",
+			"email": "michele@lizzit.it",
+			"url": "https://lizzit.it/"
 		},
 		{
-			"name" : "Francesco Lacerenza",
-			"email" : "francesco@doyensec.com",
-			"url" : "https://doyensec.com/"
+			"name": "Francesco Lacerenza",
+			"email": "francesco@doyensec.com",
+			"url": "https://doyensec.com/"
 		}
 	],
 	"engines": {
@@ -266,7 +266,7 @@
 		"@typescript-eslint/parser": "^5.53.0",
 		"@vscode/test-electron": "^2.2.3",
 		"@vscode/vsce": "^2.19.0",
-		"electron": "^19.1.9",
+		"electron": "^26.0.0",
 		"electron-rebuild": "^3.2.9",
 		"eslint": "^8.34.0",
 		"glob": "^8.1.0",

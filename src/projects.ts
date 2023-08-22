@@ -188,7 +188,7 @@ export class IaCProjectDir {
         for (let row of localProjects) {
             if (!remoteProjects.some((proj: any) => proj.uuid === row.uuid)) {
                 console.log(`[IaC Projects] Pushing local project: ${row.uuid}`);
-                await rdb.pushProject(row.uuid, row.name, row.keys, false);
+                await rdb.pushProject(row.uuid, row.name, row.jwt, false);
             }
         }
 
@@ -200,7 +200,7 @@ export class IaCProjectDir {
                 continue;
             }
             console.log(`[IaC Projects] Pulling remote project into local db: ${uuid}`);
-            await this.pushProject(proj.uuid, proj.name, proj.keys);
+            await this.pushProject(proj.uuid, proj.name, null, proj.jwt);
         }
 
         console.log(`[IaC Projects] syncProjects() done`);
