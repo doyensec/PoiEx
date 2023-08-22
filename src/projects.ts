@@ -142,7 +142,7 @@ export class IaCProjectDir {
         let remoteProjectUuids = remoteProjects.map((row: any) => row.uuid);
         console.log(`[IaC Projects] remoteProjects: ${remoteProjectUuids} total ${remoteProjects.length}`);
 
-        let stmt = await this.pdb.prepare('SELECT uuid, name, keys, deleted FROM projects');
+        let stmt = await this.pdb.prepare('SELECT uuid, name, jwt, deleted FROM projects');
         let rows = await stmt.all();
         await stmt.finalize();
         let localProjects = rows.filter((row: any) => row.deleted !== 1);
