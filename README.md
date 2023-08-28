@@ -1,22 +1,26 @@
-# DS-SAST
+# PoiEx
 
-## What's DS-SAST?
+## What's PoiEx?
 
-**DS-SAST** is an experimental VS Code extension built to identify and visualize the Points Of Intersection between a web application and the underlying infrastructure.  
+**PoiEx** is an experimental VS Code extension built to identify and visualize the Points Of Intersection between a web application and the underlying infrastructure.  
 
 </br>
 <p align="center">
-    <img src="images/logo-1.png" width="30%" alt="DS-SAST logo">
+    <img src="images/logo-1.png" width="30%" alt="PoiEx logo">
 </p>
 </br>
 
 ## Try it out!
 
-Download and install the VSIX extension from GitHub Releases. Make sure you have Semgrep installed before running DS-SAST.
+Download and install the VSIX extension from GitHub Releases. Make sure you have Semgrep installed before running PoiEx.
+
+## Point of Intersection
+
+A Point of Intersection (PoI) marks where your code interacts with underlying infrastructure, revealing connections between your software and Infrastructure as Code (IaC). PoiEx identifies and visualizes PoIs, allowing testers and cloud security specialists to better understand and identify security vulnerabilities in your cloud applications.
 
 ## Basic usage
 
-DS-SAST allows users to scan the application code and the IaC definition at the same time, generating results in a nice and user friendly view. Users can navigate the infrastructure diagram and quickly jump to the relevant application code sections where the selected infrastructure resource is used. Additionally, DS-SAST provides for advanced collaborations capabilities, notes taking using the VS Code Comments API and integration with Semgrep, allowing DS-SAST to be used also as a standalone Semgrep extension without any of the IaC-specific features.
+PoiEx allows users to scan the application code and the IaC definition at the same time, generating results in a nice and user friendly view. Users can navigate the infrastructure diagram and quickly jump to the relevant application code sections where the selected infrastructure resource is used. Additionally, PoiEx provides for advanced collaborations capabilities, notes taking using the VS Code Comments API and integration with Semgrep, allowing PoiEx to be used also as a standalone Semgrep extension without any of the IaC-specific features.
 
 ### IaC Diagrams
 
@@ -42,15 +46,15 @@ DS-SAST allows users to scan the application code and the IaC definition at the 
 When collaboration mode is disabled, each project is stored in a local SQLite database. In this mode, projects are not synchronized or shared across different collaborators.
 
 ## Collaboration mode
-DS-SAST allows for real-time synchronization of findings and comments with other users. This mode requires a MongoDB instance shared across all collaborators.  
-Set your name in _Settings > Estensions > DS-SAST > Author Name_ and the database URI. See section below for how to deploy a MongoDB instance.
+PoiEx allows for real-time synchronization of findings and comments with other users. This mode requires a MongoDB instance shared across all collaborators.  
+Set your name in _Settings > Estensions > PoiEx > Author Name_ and the database URI. See section below for how to deploy a MongoDB instance.
 
 <h1 align="center">
   <sub>
     <img src="images/logo-1.png" height="48" alt="icon">
   </sub>
   <sup>
-    &nbsp;DS-SAST
+    &nbsp;PoiEx
   </sup>
 </h1>
 
@@ -77,20 +81,15 @@ Set your name in _Settings > Estensions > DS-SAST > Author Name_ and the databas
 * Match Semgrep HCL findings with their respective resource
 * Interactive diagram that links PoIs and findings with their respective diagram entity
 
-## TODO:
- * Add support for reactions
- * Add animations to README.md
- * Rename the extension
-
 ## Requirements
 
 Semgrep is required to be already installed.
 
 ### MongoDB (optional)
-DS-SAST supports real-time project synchronization between multiple collaborators.  
+PoiEx supports real-time project synchronization between multiple collaborators.  
 To enable collaboration features all collaborators should connect to a common MongoDB instance.
-All collaborators should have read and write access to the database configured in the `ds-sast.collab.database` field of VSCode settings. To enable collaboration features set `ds-sast.collab.enabled` to `true` and `ds-sast.collab.uri` to the MongoDB URI. Optionally update `ds-sast.collab.database` if using a database name different from the default value. If credentials are required to connect to the database the extension will prompt the user for credentials.  
-The extension supports an auto-delete feature, if `ds-sast.collab.expireAfter` is set to a value higher than 0 it will configure MongoDB to automatically delete projects that are not accessed for the specified number of seconds. The project expiration value is reset each time one of the collaborators accesses the project. The expiration value does not affect project data that is saved locally: if a project is not found on the remote database (because it never existed, or has expired) the extension will push the local version to the remote database.
+All collaborators should have read and write access to the database configured in the `poiex.collab.database` field of VSCode settings. To enable collaboration features set `poiex.collab.enabled` to `true` and `poiex.collab.uri` to the MongoDB URI. Optionally update `poiex.collab.database` if using a database name different from the default value. If credentials are required to connect to the database the extension will prompt the user for credentials.  
+The extension supports an auto-delete feature, if `poiex.collab.expireAfter` is set to a value higher than 0 it will configure MongoDB to automatically delete projects that are not accessed for the specified number of seconds. The project expiration value is reset each time one of the collaborators accesses the project. The expiration value does not affect project data that is saved locally: if a project is not found on the remote database (because it never existed, or has expired) the extension will push the local version to the remote database.
 
 MongoDB deployment steps on Ubuntu 22.04:
 
@@ -135,14 +134,14 @@ After deployment create additional user(s) for the extension collaborators. Each
 
 This extension contributes the following settings:
 
-* `ds-sast.enableIaC`: Enable IaC features of this extension 
-* `ds-sast.authorName`: Author name for comments.
-* `ds-sast.semgrepArgs`: Semgrep command line arguments.
-* `ds-sast.semgrepTimeout`: Semgrep execution timeout in seconds.
-* `ds-sast.collab.enabled`: Enable collaboration via MongoDB.
-* `ds-sast.collab.uri`: URI of the remote MongoDB server.
-* `ds-sast.collab.database`: Name of the MongoDB database.
-* `ds-sast.collab.expireAfter`: Auto-delete comments on remote database after a certain amount of seconds. (Set to 0 to disable)
+* `poiex.enableIaC`: Enable IaC features of this extension 
+* `poiex.authorName`: Author name for comments.
+* `poiex.semgrepArgs`: Semgrep command line arguments.
+* `poiex.semgrepTimeout`: Semgrep execution timeout in seconds.
+* `poiex.collab.enabled`: Enable collaboration via MongoDB.
+* `poiex.collab.uri`: URI of the remote MongoDB server.
+* `poiex.collab.database`: Name of the MongoDB database.
+* `poiex.collab.expireAfter`: Auto-delete comments on remote database after a certain amount of seconds. (Set to 0 to disable)
 
 ## Release Notes
 
