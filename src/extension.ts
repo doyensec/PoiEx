@@ -295,7 +295,7 @@ async function openProject(context: vscode.ExtensionContext, storageUri: vscode.
 		projectSecret = pkeys;
 	}
 	await mIaCEncryption.setKey(projectSecret);
-	if (pkeys === "") { // If no key was in database
+	if ((pkeys === "") || (pkeys === null)) { // If no key was in database
 		// Check that key is correct and add to database
 		if (await mIaCEncryption.checkKey(jwt) !== puuid) {
 			vscode.window.showErrorMessage('Incorrect project secret');
