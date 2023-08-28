@@ -33,7 +33,7 @@ export class IaCWebviewManager {
         this.context = context;
         this.mIaCDiagnostics = mIaCDiagnostics;
 
-        let disposableCommand1 = vscode.commands.registerCommand('ds-sast.showIaCwebview', () => {
+        let disposableCommand1 = vscode.commands.registerCommand('poiex.showIaCwebview', () => {
             const options: vscode.OpenDialogOptions = {
                 canSelectMany: false,
                 openLabel: 'Select IaC definiton file',

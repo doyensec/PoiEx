@@ -1,14 +1,14 @@
 export const EXT_COMMON_NAME = "DS SAST";
-export const EXT_NAME = "ds-sast";
+export const EXT_NAME = "poiex";
 export const SEMGREP_TIMEOUT_MS = 240 * 1000; // Semgrep timeout to be used when scanning HCL files
 export const REMOTEDB_INIT_TIMEOUT_MS = 10 * 1000;
 export const RW_CHECK_COLLECTION = "readWriteCheckCollection";
 export const PROJECT_DIR_COLLECTION = "projectDir";
 export const PROJECT_DIR_DB = "projectDirDB.db";
-export const IAC_FOLDER_NAME = "ds-sast-data";
+export const IAC_FOLDER_NAME = "poiex-data";
 export const DIAGNOSTICS_COLLECTION_PREFIX = "diagnostics_";
 export const COMMENTS_COLLECTION_PREFIX = "comments_";
-export const DIAGNOSTICS_CODENAME = 'ds-sast';
+export const DIAGNOSTICS_CODENAME = 'poiex';
 export const IAC_POI_MESSAGE = "IaC Point Of Intersection:";
 export const INFRAMAP_TIMEOUT_MS = 10 * 1000;
 export const INFRAMAP_DOWNLOADED_STATENAME = "inframapDownloading";

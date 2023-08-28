@@ -1,6 +1,6 @@
 {
-	"name": "ds-sast",
-	"displayName": "DS-SAST",
+	"name": "poiex",
+	"displayName": "PoiEx",
 	"description": "DS SAST Extension",
 	"version": "0.0.1",
 	"publisher": "michelelizzit",
@@ -24,7 +24,7 @@
 	],
 	"activationEvents": [
 		"onStartupFinished",
-		"onView:ds-sast"
+		"onView:poiex"
 	],
 	"extensionDependencies": [
 		"mindaro-dev.file-downloader"
@@ -33,90 +33,90 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "ds-sast.readSemgrepJson",
+				"command": "poiex.readSemgrepJson",
 				"title": "Read Semgrep Json"
 			},
 			{
-				"command": "ds-sast.create_note",
+				"command": "poiex.create_note",
 				"title": "Create new comment",
 				"enablement": "!commentIsEmpty"
 			},
 			{
-				"command": "ds-sast.replyNote",
+				"command": "poiex.replyNote",
 				"title": "Reply",
 				"enablement": "!commentIsEmpty"
 			},
 			{
-				"command": "ds-sast.editNote",
+				"command": "poiex.editNote",
 				"title": "Edit"
 			},
 			{
-				"command": "ds-sast.deleteNote",
+				"command": "poiex.deleteNote",
 				"title": "Delete"
 			},
 			{
-				"command": "ds-sast.deleteNoteComment",
+				"command": "poiex.deleteNoteComment",
 				"title": "Delete"
 			},
 			{
-				"command": "ds-sast.saveNote",
+				"command": "poiex.saveNote",
 				"title": "Save"
 			},
 			{
-				"command": "ds-sast.cancelsaveNote",
+				"command": "poiex.cancelsaveNote",
 				"title": "Cancel"
 			},
 			{
-				"command": "ds-sast.dispose",
+				"command": "poiex.dispose",
 				"title": "Remove All Notes (DANGER)"
 			}
 		],
 		"configuration": {
 			"title": "DS SAST",
 			"properties": {
-				"ds-sast.authorName": {
+				"poiex.authorName": {
 					"type": "string",
 					"description": "Author name for comments.",
 					"default": "No-name"
 				},
-				"ds-sast.semgrepArgs": {
+				"poiex.semgrepArgs": {
 					"type": "string",
 					"description": "Semgrep command line arguments.",
 					"default": "--config auto"
 				},
-				"ds-sast.semgrepTimeout": {
+				"poiex.semgrepTimeout": {
 					"type": "number",
 					"description": "Semgrep execution timeout in seconds.",
 					"default": 240,
 					"minimum": 10,
 					"maximum": 7200
 				},
-				"ds-sast.enableIaC": {
+				"poiex.enableIaC": {
 					"type": "boolean",
 					"description": "Enable IaC-specific features.",
 					"default": false
 				},
-				"ds-sast.inframapPath": {
+				"poiex.inframapPath": {
 					"type": "string",
 					"description": "Path to inframap binary.",
 					"default": ""
 				},
-				"ds-sast.collab.enabled": {
+				"poiex.collab.enabled": {
 					"type": "boolean",
 					"description": "Enable collaboration via MongoDB.",
 					"default": false
 				},
-				"ds-sast.collab.uri": {
+				"poiex.collab.uri": {
 					"type": "string",
 					"description": "URI of the remote MongoDB server.",
 					"default": "mongodb://localhost:27017/"
 				},
-				"ds-sast.collab.database": {
+				"poiex.collab.database": {
 					"type": "string",
 					"description": "Name of the MongoDB database.",
-					"default": "ds-sast"
+					"default": "poiex"
 				},
-				"ds-sast.collab.expireAfter": {
+				"poiex.collab.expireAfter": {
 					"type": "string",
 					"description": "Auto-delete comments on remote database after a certain amount of seconds. (Set to 0 to disable)",
 					"default": "0"
@@ -126,59 +126,59 @@
 		"menus": {
 			"comments/commentThread/title": [
 				{
-					"command": "ds-sast.deleteNote",
+					"command": "poiex.deleteNote",
 					"group": "navigation",
-					"when": "commentController == ds-sast && !commentThreadIsEmpty"
+					"when": "commentController == poiex && !commentThreadIsEmpty"
 				}
 			],
 			"comments/commentThread/context": [
 				{
-					"command": "ds-sast.create_note",
+					"command": "poiex.create_note",
 					"group": "inline",
-					"when": "commentController == ds-sast && commentThreadIsEmpty"
+					"when": "commentController == poiex && commentThreadIsEmpty"
 				},
 				{
-					"command": "ds-sast.replyNote",
+					"command": "poiex.replyNote",
 					"group": "inline",
-					"when": "commentController == ds-sast && !commentThreadIsEmpty"
+					"when": "commentController == poiex && !commentThreadIsEmpty"
 				}
 			],
 			"comments/comment/title": [
 				{
-					"command": "ds-sast.editNote",
+					"command": "poiex.editNote",
 					"group": "group@1",
-					"when": "commentController == ds-sast"
+					"when": "commentController == poiex"
 				},
 				{
-					"command": "ds-sast.deleteNoteComment",
+					"command": "poiex.deleteNoteComment",
 					"group": "group@2",
-					"when": "commentController == ds-sast && comment == canDelete"
+					"when": "commentController == poiex && comment == canDelete"
 				}
 			],
 			"comments/comment/context": [
 				{
-					"command": "ds-sast.cancelsaveNote",
+					"command": "poiex.cancelsaveNote",
 					"group": "inline@1",
-					"when": "commentController == ds-sast"
+					"when": "commentController == poiex"
 				},
 				{
-					"command": "ds-sast.saveNote",
+					"command": "poiex.saveNote",
 					"group": "inline@2",
-					"when": "commentController == ds-sast"
+					"when": "commentController == poiex"
 				}
 			]
 		},
 		"viewsContainers": {
 			"activitybar": [
 				{
-					"id": "ds-sast",
+					"id": "poiex",
 					"title": "DS SAST",
 					"icon": "media/infrastructure.svg"
 				}
 			]
 		},
 		"views": {
-			"ds-sast": [
+			"poiex": [
 				{
 					"id": "iacAudit",
 					"name": "DS SAST - Semgrep",
@@ -194,13 +194,13 @@
 		"viewsWelcome": [
 			{
 				"view": "iacAudit",
-				"contents": "Automatically run Semgrep on the currently open workspace folder.\n[Run Semgrep on current Workspace](command:ds-sast.runSemgrep)\nManually provide a Semgrep JSON file. Make sure that you run Semgrep relative to the currently open workspace directory.\n[Provide Semgrep Json File](command:ds-sast.readSemgrepJson)\nDelete all findings generated with this extension.\n[Delete all diagnostics](command:ds-sast.deleteAllDiagnostics)",
+				"contents": "Automatically run Semgrep on the currently open workspace folder.\n[Run Semgrep on current Workspace](command:poiex.runSemgrep)\nManually provide a Semgrep JSON file. Make sure that you run Semgrep relative to the currently open workspace directory.\n[Provide Semgrep Json File](command:poiex.readSemgrepJson)\nDelete all findings generated with this extension.\n[Delete all diagnostics](command:poiex.deleteAllDiagnostics)",
 				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true"
 			},
 			{
 				"view": "iacAudit",
-				"contents": "Analyze the current project and show IaC-specific diagram.\n[Show IaC diagram](command:ds-sast.showIaCwebview)",
-				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true && config.ds-sast.enableIaC == true"
+				"contents": "Analyze the current project and show IaC-specific diagram.\n[Show IaC diagram](command:poiex.showIaCwebview)",
+				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true && config.poiex.enableIaC == true"
 			},
 			{
 				"view": "iacAudit",
@@ -229,22 +229,22 @@
 			},
 			{
 				"view": "iacProjectManager",
-				"contents": "Initialize a new project on current Workspace.\n[Init project](command:ds-sast.initProject)\nOpen existing project from remote database.\n[Open existing project](command:ds-sast.openProject)",
+				"contents": "Initialize a new project on current Workspace.\n[Init project](command:poiex.initProject)\nOpen existing project from remote database.\n[Open existing project](command:poiex.openProject)",
 				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == false"
 			},
 			{
 				"view": "iacProjectManager",
-				"contents": "Close current project.\n[Close project](command:ds-sast.closeProject)\nExport currently open project to a file.\n[Export project](command:ds-sast.exportProject)\nDestroy current project on local database only.\n[Destroy local project](command:ds-sast.destroyLocalProject)",
+				"contents": "Close current project.\n[Close project](command:poiex.closeProject)\nExport currently open project to a file.\n[Export project](command:poiex.exportProject)\nDestroy current project on local database only.\n[Destroy local project](command:poiex.destroyLocalProject)",
 				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true"
 			},
 			{
 				"view": "iacProjectManager",
-				"contents": "Destroy current project on local and remote database.\n[Destroy project](command:ds-sast.destroyProject)",
+				"contents": "Destroy current project on local and remote database.\n[Destroy project](command:poiex.destroyProject)",
 				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true && iacAudit.isProjectCreator == true"
 			},
 			{
 				"view": "iacProjectManager",
-				"contents": "Copy encryption key to clipboard.\n[Copy key to clipboard](command:ds-sast.copyKey)",
+				"contents": "Copy encryption key to clipboard.\n[Copy key to clipboard](command:poiex.copyKey)",
 				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == true && iacAudit.isProjectEncrypted == true"
 			}
 		]
