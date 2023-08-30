@@ -26,11 +26,8 @@ PoiEx allows users to scan the application code and the IaC definition at the sa
 
 PoiEx relies on [Inframap](https://github.com/cycloidio/inframap/) to generate an interactive IaC diagram. Each entity in the diagram is clickable, and reveals PoIs that are linked to the selected entity. By then clicking on a PoI, PoiEx jumps to the relevant code section. If you do not have a Terraform IaC definition file but you have access to the live infrastructure, you can use reverse-terraforming tools such as [terraformer](https://github.com/GoogleCloudPlatform/terraformer) to generate an IaC file from existing infrastructure.
 
-![IaC Diagrams](images/feature-diagram.png)
+![IaC Diagrams](images/animation-diagram.gif)
 *IaC Diagrams*
-
-![IaC - App Linking](images/feature-poi.png)
-*IaC - App Linking*
 
 ### Semgrep integration
 
