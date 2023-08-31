@@ -2,7 +2,7 @@
 	"name": "poiex",
 	"displayName": "PoiEx",
 	"description": "Point of Intersection Explorer",
-	"version": "1.0",
+	"version": "1.0.0",
 	"publisher": "doyensec",
 	"contributors": [
 		{
