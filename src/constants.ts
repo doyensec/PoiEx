@@ -1,4 +1,4 @@
-export const EXT_COMMON_NAME = "DS SAST";
+export const EXT_COMMON_NAME = "PoiEx";
 export const EXT_NAME = "poiex";
 export const SEMGREP_TIMEOUT_MS = 240 * 1000; // Semgrep timeout to be used when scanning HCL files
 export const REMOTEDB_INIT_TIMEOUT_MS = 10 * 1000;

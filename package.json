@@ -1,8 +1,8 @@
 {
 	"name": "poiex",
 	"displayName": "PoiEx",
-	"description": "DS SAST Extension",
-	"version": "0.0.1",
+	"description": "Point of Intersection Explorer",
+	"version": "1.0",
 	"publisher": "michelelizzit",
 	"contributors": [
 		{
@@ -72,7 +72,7 @@
 			}
 		],
 		"configuration": {
-			"title": "DS SAST",
+			"title": "PoiEx",
 			"properties": {
 				"poiex.authorName": {
 					"type": "string",
@@ -172,7 +172,7 @@
 			"activitybar": [
 				{
 					"id": "poiex",
-					"title": "DS SAST",
+					"title": "PoiEx",
 					"icon": "media/infrastructure.svg"
 				}
 			]
@@ -181,12 +181,12 @@
 			"poiex": [
 				{
 					"id": "iacAudit",
-					"name": "DS SAST - Semgrep",
+					"name": "PoiEx - Semgrep",
 					"contextualTitle": "Explore Semgrep Findings"
 				},
 				{
 					"id": "iacProjectManager",
-					"name": "DS SAST - Manage projects",
+					"name": "PoiEx - Manage projects",
 					"contextualTitle": "Manage IaC Audit projects"
 				}
 			]
