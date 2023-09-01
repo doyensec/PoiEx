@@ -4,6 +4,8 @@ on:
       - main
   workflow_dispatch:
 
+name: Build VSIX file
+
 jobs:
   build:
     runs-on: ubuntu-latest
