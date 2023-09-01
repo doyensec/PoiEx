@@ -20,7 +20,7 @@ A Point of Intersection (PoI) marks where your code interacts with underlying in
 
 ## Basic usage
 
-PoiEx allows users to scan the application code and the IaC definition at the same time, generating results in a nice and user friendly view. Users can navigate the infrastructure diagram and quickly jump to the relevant application code sections where the selected infrastructure resource is used. Additionally, PoiEx provides for advanced collaborations capabilities, notes taking using the VS Code Comments API and integration with [Semgrep](https://semgrep.dev/), allowing PoiEx to be used also as a standalone Semgrep extension without any of the IaC-specific features.
+PoiEx allows users to scan the application code and the IaC definition at the same time, generating results in a nice and user-friendly view. Users can navigate the infrastructure diagram and quickly jump to the relevant application code sections where the selected infrastructure resource is used. Additionally, PoiEx provides for advanced collaboration capabilities, notes taking using the VS Code Comments API and integration with [Semgrep](https://semgrep.dev/), allowing PoiEx to be used also as a standalone Semgrep extension without any of the IaC-specific features.
 
 ### IaC Diagrams and IaC-app linking
 
@@ -50,13 +50,13 @@ Collaboration mode is described in [COLLAB_MODE.md](./COLLAB_MODE.md).
 This extension contributes the following settings:
 
 * `poiex.enableIaC`: Enable IaC features of this extension 
-* `poiex.authorName`: Author name for comments.
-* `poiex.semgrepArgs`: Semgrep command line arguments.
-* `poiex.semgrepTimeout`: Semgrep execution timeout in seconds.
-* `poiex.collab.enabled`: Enable collaboration via MongoDB.
-* `poiex.collab.uri`: URI of the remote MongoDB server.
-* `poiex.collab.database`: Name of the MongoDB database.
-* `poiex.collab.expireAfter`: Auto-delete comments on remote database after a certain amount of seconds. (Set to 0 to disable)
+* `poiex.authorName`: Author name for comments
+* `poiex.semgrepArgs`: Semgrep command line arguments
+* `poiex.semgrepTimeout`: Semgrep execution timeout (in seconds)
+* `poiex.collab.enabled`: Enable collaboration via MongoDB
+* `poiex.collab.uri`: URI of the remote MongoDB server
+* `poiex.collab.database`: Name of the MongoDB database
+* `poiex.collab.expireAfter`: Auto-delete comments on the remote database after a certain amount of seconds (set to 0 to disable)
 
 ## Release Notes
 
