@@ -98,7 +98,7 @@ export async function runSemgrepHcl(context: vscode.ExtensionContext, path: stri
     if (semgrepPath === undefined) { return null; }
 
     let semgrepArgsArray: string[] = ["--config", context.asAbsolutePath("tfparse_rules/")];
-    semgrepArgsArray = ["--oss-only", "--no-git-ignore", "--json", "--quiet"].concat(semgrepArgsArray).concat(["./"]);
+    semgrepArgsArray = ["--no-git-ignore", "--json", "--quiet"].concat(semgrepArgsArray).concat(["./"]);
     console.log(`[IaC Semgrep] Running Semgrep with args: ${semgrepArgsArray}`);
 
     let execFile = util.promisify(child_process.execFile);
