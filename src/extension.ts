@@ -177,46 +177,37 @@ async function init1(context: vscode.ExtensionContext, iacPath: string) {
 			return;
 		}
 
-		let cb = () => {
-			// Ask for project name
-			vscode.window.showInputBox({
-				placeHolder: 'Please enter project name',
-				prompt: 'Please enter project name',
-				validateInput: (value: string) => {
-					if (value === undefined || value === '') {
-						return 'Project name cannot be empty';
-					}
-					return undefined;
+		// Ask for project name
+		vscode.window.showInputBox({
+			placeHolder: 'Please enter project name',
+			prompt: 'Please enter project name',
+			validateInput: (value: string) => {
+				if (value === undefined || value === '') {
+					return 'Project name cannot be empty';
 				}
-			}).then((projectName) => {
-				if (projectName === undefined) {
+				return undefined;
+			}
+		}).then((projectName) => {
+			if (projectName === undefined) {
+				return;
+			}
+			// Quickselect "Do you want to encrypt the project?" dialog
+			vscode.window.showQuickPick(['Yes', 'No'], {
+				placeHolder: 'Do you want to encrypt the project?'
+			}).then(async (value) => {
+				if (value === undefined) {
 					return;
 				}
-				// Quickselect "Do you want to encrypt the project?" dialog
-				vscode.window.showQuickPick(['Yes', 'No'], {
-					placeHolder: 'Do you want to encrypt the project?'
-				}).then(async (value) => {
-					if (value === undefined) {
-						return;
-					}
-					let encrypt = value === 'Yes';
-					// Push to local database
-					let projectUuid = util.genUUID();
-					let projectSecret = encrypt ? await IaCEncryption.genKey() : null;
-					await pdb.pushProject(projectUuid, projectName, projectSecret);
-					pdb.safeSyncProjects(rdb);
+				let encrypt = value === 'Yes';
+				// Push to local database
+				let projectUuid = util.genUUID();
+				let projectSecret = encrypt ? await IaCEncryption.genKey() : null;
+				await pdb.pushProject(projectUuid, projectName, projectSecret);
+				pdb.safeSyncProjects(rdb);
 
-					openProject(context, iacUri, projectUuid);
-				});
+				openProject(context, iacUri, projectUuid);
 			});
-		};
-
-		if (rdb.settingsEnabled()) {
-			rdb.onDbReadyOnce(() => { pdb.safeSyncProjects(rdb); cb(); });
-		}
-		else {
-			cb();
-		}
+		});
 	}));
 
 	// Register command to open an existing project
@@ -295,7 +286,7 @@ async function openProject(context: vscode.ExtensionContext, storageUri: vscode.
 		projectSecret = pkeys;
 	}
 	await mIaCEncryption.setKey(projectSecret);
-	if ((pkeys === "") || (pkeys === null)) { // If no key was in database
+	if (((pkeys === "") || (pkeys === null)) && (jwt !== "") && (jwt !== null)) { // If no key was in database and project uses encryption
 		// Check that key is correct and add to database
 		if (await mIaCEncryption.checkKey(jwt) !== puuid) {
 			vscode.window.showErrorMessage('Incorrect project secret');

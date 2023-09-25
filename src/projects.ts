@@ -128,6 +128,7 @@ export class IaCProjectDir {
         this.currentSync = this.syncProjects(rdb).finally(() => {
             this.currentSync = undefined;
         });
+        await this.currentSync;
     }
 
     async syncProjects(rdb: RemoteDB): Promise<void> {

@@ -32,7 +32,7 @@ export class IaCWebviewManager {
     constructor(context: vscode.ExtensionContext, mIaCDiagnostics: IaCDiagnostics) {
         this.context = context;
         this.mIaCDiagnostics = mIaCDiagnostics;
-
+        
         let disposableCommand1 = vscode.commands.registerCommand('poiex.showIaCwebview', () => {
             const options: vscode.OpenDialogOptions = {
                 canSelectMany: false,
@@ -42,13 +42,30 @@ export class IaCWebviewManager {
                     'All files': ['*']
                 }
             };
-
-            vscode.window.showOpenDialog(options).then(fileUri => {
-                if (!(fileUri && fileUri[0])) {
-                    return;
+            
+            vscode.window.showOpenDialog(options).then(
+                fileUri => {
+                    if (!(fileUri && fileUri[0])) {
+                        return;
+                    }
+                    if (this.diagnostics.size > 0) {
+                        return fileUri;
+                    }
+                    return vscode.window.showInformationMessage("No findings. Do you want to run Semgrep?", "Yes", "No").then(
+                        (ans) => {
+                            if (ans == "No") {
+                                return fileUri;
+                            }
+                            util.handleStartSemgrepScan(context, mIaCDiagnostics);
+                            return null;
+                        }
+                    );
                 }
+            ).then(fileUri => {
+                if (fileUri === undefined) return;
+                if (fileUri === null) return;
                 console.log('Selected file: ' + fileUri[0].fsPath);
-
+                
                 this.runInframap(fileUri[0].fsPath);
             });
         });

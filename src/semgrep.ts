@@ -89,7 +89,7 @@ export function runSemgrep(context: vscode.ExtensionContext, path: string, mIaCD
         return;
     }
 
-    child_process.execFile(semgrepPath, semgrepArgsArray, { timeout: semgrepTimeout * 1000, cwd: path }, semgrepCallback);
+    child_process.execFile(semgrepPath, semgrepArgsArray, { timeout: semgrepTimeout * 1000, cwd: path, maxBuffer: 1024 * 1024 * 2 }, semgrepCallback);
     return;
 }
 
@@ -104,7 +104,7 @@ export async function runSemgrepHcl(context: vscode.ExtensionContext, path: stri
     let execFile = util.promisify(child_process.execFile);
 
     try {
-        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: SEMGREP_TIMEOUT_MS, cwd: path });
+        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: SEMGREP_TIMEOUT_MS, cwd: path, maxBuffer: 1024 * 1024 * 2 });
         if (stderr) {
             console.log(`[IaC Semgrep] stderr: ${stderr}`);
             vscode.window.showErrorMessage(`Semgrep error: ${stderr}`);

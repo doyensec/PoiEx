@@ -96,11 +96,6 @@
 					"description": "Enable IaC-specific features.",
 					"default": false
 				},
-				"poiex.inframapPath": {
-					"type": "string",
-					"description": "Path to inframap binary.",
-					"default": ""
-				},
 				"poiex.collab.enabled": {
 					"type": "boolean",
 					"description": "Enable collaboration via MongoDB.",
