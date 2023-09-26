@@ -55,6 +55,11 @@ export class RemoteDB {
         this.dbName = vscode.workspace.getConfiguration(`${constants.EXT_NAME}`).get('collab.database', null);
     }
 
+    getDbName(): string | null {
+        this.fetchSettings();
+        return this.dbName;
+    }
+
     setProjectUuid(uuid: string | null, projectSecret: string | null = null) {
         this.projectUuid = uuid;
         this.encryptionManager.dispose();

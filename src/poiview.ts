@@ -11,12 +11,14 @@ export class IaCPoIViewManager {
     private diagnostics: Map<string, any> = new Map<string, any>();
     private disposed = false;
     private poiFilter;
+    private mIaCDiagnostics: IaCDiagnostics;
     private resourceBlocks: Map<string, [string, number, number, number, number]>;
 
     constructor(context: vscode.ExtensionContext, mIaCDiagnostics: IaCDiagnostics, poiFilter: string, resourceBlocks: Map<string, [string, number, number, number, number]>) {
         this.context = context;
         this.poiFilter = poiFilter;
         this.resourceBlocks = resourceBlocks;
+        this.mIaCDiagnostics = mIaCDiagnostics;
         mIaCDiagnostics.onDiagnosticsUpdate((diagnostics) => { this.diagnosticsUpdate(diagnostics); });
 
         this.currentPanel = vscode.window.createWebviewPanel(
@@ -28,7 +30,11 @@ export class IaCPoIViewManager {
 
         this.currentPanel.onDidDispose(() => { this.currentPanel = undefined; }, null, this.disposables);
 
-        this.currentPanel.webview.html = this.getWebviewContent();
+        this.getWebviewContent().then( data => {
+            if (this.currentPanel !== undefined) {
+                this.currentPanel.webview.html = data;
+            }
+        })
 
         this.currentPanel.webview.onDidReceiveMessage(async message => {
             console.log(message);
@@ -71,12 +77,14 @@ export class IaCPoIViewManager {
     diagnosticsUpdate(diagnostics: Map<string, any>) {
         if (this.disposed) { return; }
         this.diagnostics = diagnostics;
-        if (this.currentPanel !== undefined) {
-            this.currentPanel.webview.html = this.getWebviewContent();
-        }
+        this.getWebviewContent().then( data => {
+            if (this.currentPanel !== undefined) {
+                this.currentPanel.webview.html = data;
+            }
+        })
     }
 
-    private getWebviewContent(): string {
+    private async getWebviewContent(): Promise<string> {
         let poiList = [];
         let providerFilter = "";
         let serviceFilter = "";
@@ -113,6 +121,23 @@ export class IaCPoIViewManager {
             console.log(`[PoI View] No resource block found for ${this.poiFilter}`);
         }
 
+        // Get IaC definition for selected resource block
+        let iacDefinitionBlock: string | null = null;
+        if (resourceBlock !== undefined) {
+            let [path, startLine, startCol, endLine, endCol] = resourceBlock;
+             
+            // Document from semgrep path
+            let doc = await this.mIaCDiagnostics.getDocumentFromSemgrepPath(path);
+            if (doc === undefined) {
+                vscode.window.showErrorMessage(`File ${path} not found`);
+            }
+            else {
+                // Semgrep lines are 1-indexed, vscode lines are 0-indexed
+                let r = new vscode.Range(startLine - 1, startCol - 1, endLine - 1, endCol - 1);
+                iacDefinitionBlock = doc.getText(r);
+            }
+        }
+
         let scriptUri = vscode.Uri.joinPath(this.context.extensionUri, 'res', 'poiView.js');
         let styleUri = vscode.Uri.joinPath(this.context.extensionUri, 'res', 'poiView.css');
         let scriptWebUri = "./res/poiView.js";
@@ -130,6 +155,7 @@ export class IaCPoIViewManager {
                     /* Dynamically generated constants */
                     const poiFilter = '${this.poiFilter}';
                     const poiList = ${JSON.stringify(poiList)};
+                    const iacResource = ${JSON.stringify(iacDefinitionBlock)};
                 </script>
             </head>
             <body>

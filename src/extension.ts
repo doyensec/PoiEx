@@ -32,14 +32,15 @@ export async function initLocalDb(dbDir: string, projectUuid: string) {
 function updateStatusBar(rdb: RemoteDB, remoteStatus: vscode.StatusBarItem) {
 	remoteStatus.command = `${constants.EXT_NAME}.statusBarButton`;
 	if (rdb.settingsEnabledAndConfigured()) {
-		remoteStatus.text = '$(compass-dot) Remote DB: Enabled (disconnected)';
+		let dbName = rdb.getDbName();
+		remoteStatus.text = `$(compass-dot) Remote DB: $(ellipsis) (${dbName})`;
 		if (rdb.isRemoteReady()) {
-			remoteStatus.text = '$(compass-active) Remote DB: Enabled (connected)';
+			remoteStatus.text = `$(compass-active) Remote DB: $(arrow-swap) (${dbName})`;
 		}
 		remoteStatus.tooltip = 'Click to disable remote database';
 	}
 	else {
-		remoteStatus.text = '$(compass) Remote DB: Disabled';
+		remoteStatus.text = '$(compass) Remote DB: $(circle-slash)';
 		remoteStatus.tooltip = 'Click to enable remote database';
 	}
 	remoteStatus.show();

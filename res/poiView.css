@@ -1,4 +1,4 @@
-.poitable {
+.poitable, .iactable {
     width: 100%;
     border-collapse: collapse;
     border: 1px solid #ddd;
@@ -12,9 +12,18 @@
     background-color: var(--vscode-inputOption-hoverBackground);
 }
 
-.poitd, .poith {
+.poitd, .poith, .iactd, .iacth {
     padding-top: 0.25em;
     padding-bottom: 0.25em;
     padding-left: 0.5em;
     padding-right: 0.5em;
+}
+
+.iactable {
+    margin-top: 1em;
+    table-layout: fixed;
+}
+
+pre {
+    text-wrap: wrap;
 }

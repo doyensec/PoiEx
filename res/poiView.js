@@ -16,6 +16,18 @@ let res = `<table class="poitable">
 // Show the list of POIs
 for (let i = 0; i < poiList.length; i++) {
     let poiName = poiList[i][0].replace("IaC Point Of Intersection: ", "");
-    res += `<tr class="poitr"><td href='#' onclick='openPoi(this.id)' id="${poiName}" class="poitd">` + poiList[i][1] + ` @ ${poiList[i][2]}:${poiList[i][3]}` + "</td>";
+    res += `<tr class="poitr"><td href='#' onclick='openPoi(this.id)' id="${poiName}" class="poitd">` + poiList[i][1] + ` @ ${poiList[i][2]}:${poiList[i][3]}` + "</td>" + "</tr>";
 }
+res += "</table>";
+
+// Add IaC definition
+let iacRes = `<table class="iactable">
+<tr>
+<th class="iacth">IaC definition for: <i>${poiFilter}</i></th>
+</tr>`;
+
+iacRes += `<tr class="iactr"><td class="iactd"><pre>` + iacResource + "</pre></td>" + "</tr>";
+
+res += iacRes;
+
 container.innerHTML = res;
