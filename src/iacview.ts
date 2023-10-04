@@ -265,7 +265,7 @@ export class IaCWebviewManager {
                     if (message.nodeId === undefined) { return; }
                     assert(this.resourceBlocks !== undefined);
                     if (this.resourceBlocks === undefined) { return; }
-                    let serviceName = message.nodeId.replace(/[^0-9a-zA-Z_\.]/g, "");
+                    let serviceName = message.nodeId.replace(/[^0-9a-zA-Z_\.\-]/g, "");
                     new IaCPoIViewManager(this.context, this.mIaCDiagnostics, serviceName, this.resourceBlocks);
                     return;
             }

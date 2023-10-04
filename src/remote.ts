@@ -619,8 +619,8 @@ export class RemoteDB {
             return new MongoClient(parsedUrl.toString(), this.mongoClientOptions);
         }
 
-        parsedUrl.username = username;
-        parsedUrl.password = password;
+        parsedUrl.set("username", username);
+        parsedUrl.set("password", password);
 
         return new MongoClient(parsedUrl.toString(), this.mongoClientOptions);
     }

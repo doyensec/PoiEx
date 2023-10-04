@@ -73,7 +73,7 @@ export class IaCProjectDir {
             jwt = await mIaCEncryption.encrypt({ uuid: uuid });
         }
 
-        let stmt = await this.pdb.prepare('INSERT INTO projects (uuid, name, keys, jwt) VALUES (?, ?, ?, ?)');
+        let stmt = await this.pdb.prepare('INSERT OR REPLACE INTO projects (uuid, name, keys, jwt) VALUES (?, ?, ?, ?)');
         console.log(`[IaC Projects] pushProject(${uuid}, ${name}, ${keys})`);
         assert(uuid !== null);
         await stmt.run(uuid, name, keys, jwt);
