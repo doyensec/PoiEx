@@ -8,6 +8,13 @@ function openPoi(poiUUID) {
     });
 }
 
+function openIaC() {
+    console.log("[IaC PoiView (webview)] Opening IaC definition");
+    vscode.postMessage({
+        command: 'openIaC'
+    });
+}
+
 var container = document.getElementById('container');
 let res = `<table class="poitable">
 <tr>
@@ -26,7 +33,7 @@ let iacRes = `<table class="iactable">
 <th class="iacth">IaC definition for: <i>${poiFilter}</i></th>
 </tr>`;
 
-iacRes += `<tr class="iactr"><td class="iactd"><pre>` + iacResource + "</pre></td>" + "</tr>";
+iacRes += `<tr class="iactr" onclick="openIaC()"><td class="iactd"><pre>` + iacResource + "</pre></td>" + "</tr>";
 
 res += iacRes;
 

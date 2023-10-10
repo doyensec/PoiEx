@@ -61,6 +61,27 @@ export class IaCPoIViewManager {
                         editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
                     });
                     break;
+                case 'openIaC':
+                    let resourceBlock = this.resourceBlocks.get(this.poiFilter);
+                    if (resourceBlock === undefined) {
+                        vscode.window.showErrorMessage(`No resource block found for ${this.poiFilter}`);
+                        return;
+                    }
+                    let [path, startLine, startCol, endLine, endCol] = resourceBlock;
+                    let doc2 = await mIaCDiagnostics.getDocumentFromSemgrepPath(path);
+                    if (doc2 === undefined) {
+                        vscode.window.showErrorMessage(`File ${path} not found`);
+                        return;
+                    }
+                    let range = new vscode.Range(startLine - 1, startCol - 1, endLine - 1, endCol - 1);
+                    vscode.window.showTextDocument(doc2).then((editor) => {
+                        editor.selection = new vscode.Selection(range.start, range.end);
+                        editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
+                    });
+                    break;
+                default:
+                    console.error(`[PoI View] Unknown command ${message.command}`);
+                    break;
             }
         });
     }

@@ -8,7 +8,7 @@
     font-family: system-ui,Ubuntu,Droid Sans,sans-serif;
 }
 
-.poitr:hover {
+.poitr:hover, .iactr:hover {
     background-color: var(--vscode-inputOption-hoverBackground);
 }
 
