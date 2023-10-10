@@ -21,34 +21,10 @@ export function getSemgrepPath(): string | undefined {
     }
 }
 
-export async function semgrepCallback(error: any, stdout: any, stderr: any) {
-    if (hideProgressBar) {
-        hideProgressBar();
-        hideProgressBar = undefined;
-    }
-
-    if (error) {
-        console.log(`[IaC Semgrep] error: ${error.message}`);
-        let msg = `Semgrep timeout exceeded or execution error. Increase Semgrep timeout in settings. Error: ${error.message}`;
-        vscode.window.showErrorMessage(msg);
-        return;
-    }
-    if (stderr) {
-        console.log(`[IaC Semgrep] stderr: ${stderr}`);
-        vscode.window.showErrorMessage(`Semgrep error: ${stderr}`);
-        return;
-    }
-    console.log(`[IaC Semgrep] Semgrep done, stdout: ${stdout}`);
-
-    let jsonParsed = { parsed: JSON.parse(stdout), source: "semgrep-local" };
-    await gmIaCDiagnostics.clearDiagnostics();
-    await gmIaCDiagnostics.loadDiagnosticsFromSemgrep(jsonParsed);
-}
-
 let hideProgressBar: any = undefined;
 let gmIaCDiagnostics: IaCDiagnostics;
 
-export function runSemgrep(context: vscode.ExtensionContext, path: string, mIaCDiagnostics: IaCDiagnostics): void {
+export async function runSemgrep(context: vscode.ExtensionContext, path: string, mIaCDiagnostics: IaCDiagnostics): Promise<void> {
     let semgrepPath = getSemgrepPath();
     if (semgrepPath === undefined) { return; }
     if (hideProgressBar) {
@@ -89,22 +65,51 @@ export function runSemgrep(context: vscode.ExtensionContext, path: string, mIaCD
         return;
     }
 
-    child_process.execFile(semgrepPath, semgrepArgsArray, { timeout: semgrepTimeout * 1000, cwd: path, maxBuffer: 1024 * 1024 * 2 }, semgrepCallback);
-    return;
+    let execFile = util.promisify(child_process.execFile);
+    try {
+        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: semgrepTimeout * 1000, cwd: path, maxBuffer: 1024 * 1024 * 2 });
+        if (stderr) {
+            console.log(`[IaC Semgrep] stderr: ${stderr}`);
+            vscode.window.showErrorMessage(`Semgrep error: ${stderr}`);
+            return;
+        }
+        console.log(`[IaC Semgrep] Semgrep done, stdout: ${stdout}`);
+    
+        let jsonParsed = { parsed: JSON.parse(stdout), source: "semgrep-local" };
+        await gmIaCDiagnostics.clearDiagnostics();
+        await gmIaCDiagnostics.loadDiagnosticsFromSemgrep(jsonParsed);    
+    }
+    catch (error: any) {
+        console.log(`[IaC Semgrep] error: ${error.message}`);
+        let timeoutFormatted = (SEMGREP_TIMEOUT_MS / 1000).toFixed(2);
+        let msg = `Semgrep timeout (${timeoutFormatted}s) exceeded or execution error. Error: ${error.message}`;
+        vscode.window.showErrorMessage(msg);
+    }
+    finally {
+        if (hideProgressBar) {
+            hideProgressBar();
+            hideProgressBar = undefined;
+        }
+    }
 }
 
-export async function runSemgrepHcl(context: vscode.ExtensionContext, path: string): Promise<string | null> {
+export async function runSemgrepHcl(context: vscode.ExtensionContext, wspath: string, iacpath: string): Promise<string | null> {
     let semgrepPath = getSemgrepPath();
     if (semgrepPath === undefined) { return null; }
 
+    console.log(`[IaC Semgrep] Semgrep iacpath: ${iacpath}`);
+    console.log(`[IaC Semgrep] Semgrep wspath: ${wspath}`);
+    iacpath = path.relative(wspath, iacpath);
+    console.log(`[IaC Semgrep] Semgrep CWD: ${iacpath}`);
+
     let semgrepArgsArray: string[] = ["--config", context.asAbsolutePath("tfparse_rules/")];
-    semgrepArgsArray = ["--no-git-ignore", "--json", "--quiet"].concat(semgrepArgsArray).concat(["./"]);
+    semgrepArgsArray = ["--no-git-ignore", "--json", "--quiet"].concat(semgrepArgsArray).concat([iacpath]);
     console.log(`[IaC Semgrep] Running Semgrep with args: ${semgrepArgsArray}`);
 
     let execFile = util.promisify(child_process.execFile);
 
     try {
-        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: SEMGREP_TIMEOUT_MS, cwd: path, maxBuffer: 1024 * 1024 * 2 });
+        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: SEMGREP_TIMEOUT_MS, cwd: wspath, maxBuffer: 1024 * 1024 * 2 });
         if (stderr) {
             console.log(`[IaC Semgrep] stderr: ${stderr}`);
             vscode.window.showErrorMessage(`Semgrep error: ${stderr}`);

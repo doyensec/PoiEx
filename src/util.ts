@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { parseSemgrep, runSemgrep } from './semgrep';
+import { parseSemgrep, runSemgrep, runSemgrepHcl } from './semgrep';
 import { IaCDiagnostics } from './diagnostics';
 import { RemoteDB } from './remote';
+import { assert } from 'console';
 
 export async function handleOpenSemgrepJson(context: vscode.ExtensionContext, mIaCDiagnostics: IaCDiagnostics) {
     let jsonFile = await chooseJsonFile();
@@ -16,16 +17,26 @@ export async function handleOpenSemgrepJson(context: vscode.ExtensionContext, mI
     console.log("[Semgrep] OK3 ");
 }
 
-export async function handleStartSemgrepScan(context: vscode.ExtensionContext, mIaCDiagnostics: IaCDiagnostics) {
+export async function handleStartSemgrepScan(context: vscode.ExtensionContext, mIaCDiagnostics: IaCDiagnostics | null = null, iacPath: string | null = null): Promise<string | null> {
     console.log("Starting semgrep scan");
     // Run semgrep on current workspace
     // TODO: run on all workspace folders, not just first one
     if (vscode.workspace.workspaceFolders === undefined) {
         vscode.window.showErrorMessage("Cannot run Semgrep. No workspace folder is open.");
-        return;
+        return null;
     }
     let wspath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    runSemgrep(context, wspath, mIaCDiagnostics);
+    if ((iacPath == null) && (mIaCDiagnostics != null)) {
+        await runSemgrep(context, wspath, mIaCDiagnostics);
+        return null;
+    }
+    else if (iacPath != null) {
+        return await runSemgrepHcl(context, wspath, iacPath);
+    }
+    else {
+        assert(false, "[Semgrep:handleStartSemgrepScan]: either mIaCDiagnostics or iacPath must be provided");
+        return null;
+    }
 }
 
 async function chooseJsonFile(): Promise<vscode.Uri | undefined> {

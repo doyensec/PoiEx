@@ -52,12 +52,12 @@ export class IaCWebviewManager {
                         return fileUri;
                     }
                     return vscode.window.showInformationMessage("No findings. Do you want to run Semgrep?", "Yes", "No").then(
-                        (ans) => {
+                        async (ans) => {
                             if (ans == "No") {
                                 return fileUri;
                             }
-                            util.handleStartSemgrepScan(context, mIaCDiagnostics);
-                            return null;
+                            await util.handleStartSemgrepScan(context, mIaCDiagnostics);
+                            return fileUri;
                         }
                     );
                 }
@@ -315,7 +315,7 @@ export class IaCWebviewManager {
         console.log(`[IaC View] Running Inframap (${inframapPath}) with args: ${inframapArgsArray}`);
 
         // Start a Semgrep run to parse HCL files
-        let semgrepPromise = runSemgrepHcl(this.context, codeDir);
+        let semgrepPromise = util.handleStartSemgrepScan(this.context, null, codeDir);
 
         try {
             child_process.execFile(inframapPath,
