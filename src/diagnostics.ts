@@ -68,6 +68,13 @@ export class IaCDiagnostics {
         context.subscriptions.push(disposableCommand);
         this._disposables.push(disposableCommand);
 
+        // Command to flag an arbitrary finding
+        disposableCommand = vscode.commands.registerCommand(`${constants.EXT_NAME}.flagFinding`, (uuid: string, flag: number) => {
+            this.flagFinding(uuid, flag);
+        });
+        context.subscriptions.push(disposableCommand);
+        this._disposables.push(disposableCommand);
+
         if (this._rdb === undefined) {
             return;
         }
@@ -112,12 +119,14 @@ export class IaCDiagnostics {
         this._currentlyPulling = false;
     }
 
-    private async rdbPull(diagnosticsToStore: any[]): Promise<void> {
+    private async rdbPull(diagnosticsToStore: any[], isReplaceAll: boolean = true): Promise<void> {
         console.log("rdbPull");
         // Clear and rewrite local sqlite database
-        await this._db.dbClearDiagnostics();
+        if (isReplaceAll) {
+            await this._db.dbClearDiagnostics();
+        }
         for (let i = 0; i < diagnosticsToStore.length; i++) {
-            await this._db.dbCreateOrReplaceDiagnosticWithId(diagnosticsToStore[i].id, diagnosticsToStore[i].diagnostic, diagnosticsToStore[i].anchor, diagnosticsToStore[i].file_path);
+            await this._db.dbCreateOrReplaceDiagnosticWithId(diagnosticsToStore[i].id, diagnosticsToStore[i].diagnostic, diagnosticsToStore[i].anchor, diagnosticsToStore[i].file_path, diagnosticsToStore[i].flag);
         }
         // Load diagnostics from DB
         this.loadDiagnosticsFromDB();
@@ -135,6 +144,14 @@ export class IaCDiagnostics {
         return;
     }
 
+    private async flagFinding(uuid: string, flag: number): Promise<void> {
+        console.log(`flagFinding(${uuid}, ${flag})`);
+        await this._db.dbUpdateDiagnosticFlag(uuid, flag);
+        await this.syncRdb();
+        await this.loadDiagnosticsFromDB();
+        return;
+    }
+
     private async syncRdb() {
         if (this._rdb === undefined) {
             return;
@@ -144,11 +161,11 @@ export class IaCDiagnostics {
         }
         let diagnosticsToPush = await this._db.dbGetDiagnostics();
         console.log(`syncRdb(${diagnosticsToPush.length})`);
-        let diagnostics = await this._rdb.syncDiagnostics(diagnosticsToPush);
+        let [diagnostics, isReplaceAll] = await this._rdb.syncDiagnostics(diagnosticsToPush);
         if (diagnostics === undefined) {
             return;
         }
-        await this.rdbPull(diagnostics);
+        await this.rdbPull(diagnostics, isReplaceAll);
     }
 
     // TODO: This is quadratical, make it linear
@@ -179,7 +196,8 @@ export class IaCDiagnostics {
                 e["extra"]["metadata"]["source"],
                 e["extra"]["metadata"]["severity"],
                 e["extra"]["metadata"]["references"],
-                semgrepParsed["source"]
+                semgrepParsed["source"],
+                constants.FLAG_UNFLAGGED
             );
             diagnostics.push(diagnostic);
             console.log(e["path"]);
@@ -207,7 +225,7 @@ export class IaCDiagnostics {
                 "relatedInformation": e["extra"]["metadata"]["references"]
             });
 
-            await this._db.dbCreateOrReplaceDiagnosticWithId(diagUuid, serializedDiagnostic, anchor, e["path"]);
+            await this._db.dbCreateOrReplaceDiagnosticWithId(diagUuid, serializedDiagnostic, anchor, e["path"], constants.FLAG_UNFLAGGED);
             this._diagnosticsIds.set(diagUuid, diagnostic);
 
             let rawDiagnostic = {
@@ -247,6 +265,24 @@ export class IaCDiagnostics {
         await this.syncRdb();
     }
 
+    private msgToFlagId(msg: string): number {
+        if (msg.startsWith("🆕")) {
+            return constants.FLAG_UNFLAGGED;
+        }
+        else if (msg.startsWith("✅")) {
+            return constants.FLAG_RESOLVED;
+        }
+        else if (msg.startsWith("❌")) {
+            return constants.FLAG_FALSE;
+        }
+        else if (msg.startsWith("🔥")) {
+            return constants.FLAG_HOT;
+        }
+        else {
+            return constants.FLAG_UNFLAGGED;
+        }
+    }
+
     async loadDiagnosticsFromDB(): Promise<void> {
         let dbDiagnostics = await this._db.dbGetDiagnostics();
         let diagnosticsToClear = [...this._diagnosticsIds.keys()];
@@ -258,6 +294,23 @@ export class IaCDiagnostics {
             let dbAnchor = dbDiagnostics[i].anchor;
             let dbPath = dbDiagnostics[i].file_path;
             let dbId = dbDiagnostics[i].id;
+            let dbFlag = dbDiagnostics[i].flag;
+            
+            console.log("Diagnostic id: " + dbId);
+            console.log("All diagnostic ids: " + [...this._diagnosticsIds.keys()]);
+            if (this._diagnosticsIds.has(dbId)) {
+                let diagMsg = this._diagnosticsIds.get(dbId)?.message;
+                diagnosticsToClear = diagnosticsToClear.filter((e) => e !== dbId);
+                if ((diagMsg == undefined) || (dbFlag == this.msgToFlagId(diagMsg))) {
+                    console.log("Skipping updating an existing diagnostic");
+                    continue;
+                }
+                else {
+                    console.log("Updating an existing diagnostic");
+                    await this.clearOneDiagnostic(this._diagnosticsIds.get(dbId) as vscode.Diagnostic, dbId);
+                }
+            }
+            
             // Deserialize diagnostic
             let deserializedDiagnostic = JSON.parse(dbDiagnostic);
             let deserializedAnchor = JSON.parse(dbAnchor);
@@ -276,14 +329,6 @@ export class IaCDiagnostics {
             }
             console.log("Closest anchor: " + anchorLine);
 
-            console.log("Diagnostic id: " + dbId);
-            console.log("All diagnostic ids: " + [...this._diagnosticsIds.keys()]);
-            if (this._diagnosticsIds.has(dbId)) {
-                diagnosticsToClear = diagnosticsToClear.filter((e) => e !== dbId);
-                console.log("Skipping updating an existing diagnostic");
-                continue;
-            }
-
             // Create diagnostic
             const diagnostic = this.createDiagnostic(
                 dbId,
@@ -295,7 +340,8 @@ export class IaCDiagnostics {
                 deserializedDiagnostic.source,
                 deserializedDiagnostic.severity,
                 deserializedDiagnostic.relatedInformation,
-                "semgrep-remote"
+                "semgrep-remote",
+                dbFlag
             );
             // Add diagnostic to collection
             let curDiag = this._diagnostics.get(doc.uri);
@@ -308,7 +354,7 @@ export class IaCDiagnostics {
             this._diagnostics.set(doc.uri, curDiag);
 
             // Add diagnostic to SastInfo
-            let action = this.makeCodeActions(dbId, deserializedDiagnostic.source, diagnostic);
+            let action = this.makeCodeActions(dbId, deserializedDiagnostic.source, diagnostic, dbFlag);
             this._sastInfo._diagnosticCodeActions.set(diagnostic, action);
             // Add diagnostic to list of diagnostics
 
@@ -331,31 +377,35 @@ export class IaCDiagnostics {
         console.log("Diagnostics to clear: " + diagnosticsToClear);
         for (let i = 0; i < diagnosticsToClear.length; i++) {
             let diag = this._diagnosticsIds.get(diagnosticsToClear[i]);
-            console.log("Clearing diagnostic: " + diag);
-            if (diag === undefined) {
-                console.log("Diagnostic is undefined");
-                continue;
-            }
-            let diagnosticUri = null;
-            this._diagnostics.forEach((key, value) => {
-                if (value.includes(diag as vscode.Diagnostic)) {
-                    diagnosticUri = key;
-                }
-            });
-            if (diagnosticUri !== null) {
-                let diagnostics = this._diagnostics.get(diagnosticUri);
-                if (diagnostics !== undefined) {
-                    console.log(`Removing diagnostic from collection ${diagnostics.length} > ${diagnostics.filter((e) => e !== diag).length}`);
-                    this._diagnostics.set(diagnosticUri, diagnostics.filter((e) => e !== diag));
-                }
-            }
-
-            this._diagnosticsIds.delete(diagnosticsToClear[i]);
-            this._rawDiagnostics.delete(diagnosticsToClear[i]);
-            this._sastInfo._diagnosticCodeActions.delete(diag);
+            await this.clearOneDiagnostic(diag as vscode.Diagnostic, diagnosticsToClear[i]);
         }
         
         this.diagnosticsUpdate();
+    }
+
+    async clearOneDiagnostic(diag: vscode.Diagnostic, uuid: string): Promise<void> {
+        console.log("Clearing diagnostic: " + diag);
+        if (diag === undefined) {
+            console.log("Diagnostic is undefined");
+            return;
+        }
+        let diagnosticUri = null;
+        this._diagnostics.forEach((key, value) => {
+            if (value.includes(diag as vscode.Diagnostic)) {
+                diagnosticUri = key;
+            }
+        });
+        if (diagnosticUri !== null) {
+            let diagnostics = this._diagnostics.get(diagnosticUri);
+            if (diagnostics !== undefined) {
+                console.log(`Removing diagnostic from collection ${diagnostics.length} > ${diagnostics.filter((e) => e !== diag).length}`);
+                this._diagnostics.set(diagnosticUri, diagnostics.filter((e) => e !== diag));
+            }
+        }
+
+        this._diagnosticsIds.delete(uuid);
+        this._rawDiagnostics.delete(uuid);
+        this._sastInfo._diagnosticCodeActions.delete(diag);
     }
 
     // TODO: fetch from all workspaces, not just the first one
@@ -398,7 +448,7 @@ export class IaCDiagnostics {
         await this.syncRdb();
     }
 
-    private createDiagnostic(uuid: string, lineStart: number, colStart: number, lineEnd: number, colEnd: number, message: string, externalUrl: string, severity: string, references: string[], source: string): vscode.Diagnostic {
+    private createDiagnostic(uuid: string, lineStart: number, colStart: number, lineEnd: number, colEnd: number, message: string, externalUrl: string, severity: string, references: string[], source: string, flag: number): vscode.Diagnostic {
         // create range that represents, where in the document the word is
         const range = new vscode.Range(lineStart, colStart, lineEnd, colEnd);
 
@@ -416,6 +466,24 @@ export class IaCDiagnostics {
                 break;
             default:
                 severityVsc = vscode.DiagnosticSeverity.Information;
+                break;
+        }
+
+        // Add flag to message
+        switch (flag) {
+            case constants.FLAG_UNFLAGGED:
+                message = "🆕 " + message;
+                break;
+            case constants.FLAG_RESOLVED:
+                message = "✅ " + message;
+                break;
+            case constants.FLAG_FALSE:
+                message = "❌ " + message;
+                break;
+            case constants.FLAG_HOT:
+                message = "🔥 " + message;
+                break;
+            default:
                 break;
         }
 
@@ -448,13 +516,13 @@ export class IaCDiagnostics {
         diagnostic.tags = [vscode.DiagnosticTag.Unnecessary];
 
         // Add a code action
-        let action = this.makeCodeActions(uuid, externalUrl, diagnostic);
+        let action = this.makeCodeActions(uuid, externalUrl, diagnostic, flag);
         this._sastInfo._diagnosticCodeActions.set(diagnostic, action);
 
         return diagnostic;
     }
 
-    private makeCodeActions(diagUuid: string, externalUrl: string, diagnostic: vscode.Diagnostic): vscode.CodeAction[] {
+    private makeCodeActions(diagUuid: string, externalUrl: string, diagnostic: vscode.Diagnostic, flag: number): vscode.CodeAction[] {
         const action = new vscode.CodeAction('Learn more on this finding', vscode.CodeActionKind.QuickFix);
         action.command = { arguments: [externalUrl], command: `${constants.EXT_NAME}.openLink`, title: 'Learn more about this finding', tooltip: 'This will open an external page.' };
         action.diagnostics = [diagnostic];
@@ -465,6 +533,31 @@ export class IaCDiagnostics {
         action2.diagnostics = [diagnostic];
         action2.isPreferred = false;
 
-        return [action, action2];
+        if (flag == constants.FLAG_UNFLAGGED) {
+            const action3 = new vscode.CodeAction('Mark this finding as ✅ resolved', vscode.CodeActionKind.QuickFix);
+            action3.command = { arguments: [diagUuid, constants.FLAG_RESOLVED], command: `${constants.EXT_NAME}.flagFinding`, title: 'Mark this finding as resolved', tooltip: 'This will mark this finding as resolved.' };
+            action3.diagnostics = [diagnostic];
+            action3.isPreferred = false;
+
+            const action4 = new vscode.CodeAction('Mark this finding as ❌ false positive', vscode.CodeActionKind.QuickFix);
+            action4.command = { arguments: [diagUuid, constants.FLAG_FALSE], command: `${constants.EXT_NAME}.flagFinding`, title: 'Mark this finding as false positive', tooltip: 'This will mark this finding as false positive.' };
+            action4.diagnostics = [diagnostic];
+            action4.isPreferred = false;
+            
+            const action5 = new vscode.CodeAction('Mark this finding as 🔥 hot', vscode.CodeActionKind.QuickFix);
+            action5.command = { arguments: [diagUuid, constants.FLAG_HOT], command: `${constants.EXT_NAME}.flagFinding`, title: 'Mark this finding as hot', tooltip: 'This will mark this finding as hot.' };
+            action5.diagnostics = [diagnostic];
+            action5.isPreferred = false;
+
+            return [action, action2, action3, action4, action5];
+        }
+        else {
+            const action3 = new vscode.CodeAction('Unmark ↩️ this finding', vscode.CodeActionKind.QuickFix);
+            action3.command = { arguments: [diagUuid, constants.FLAG_UNFLAGGED], command: `${constants.EXT_NAME}.flagFinding`, title: 'Unmark this finding', tooltip: 'This will unmark this finding.' };
+            action3.diagnostics = [diagnostic];
+            action3.isPreferred = false;
+
+            return [action, action2, action3];
+        }
     }
 }

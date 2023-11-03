@@ -535,7 +535,7 @@ export class RemoteDB {
         await collection.deleteMany({ _id: { $in: remoteUUIDs } });
     }
 
-    async pushDiagnostics(diagnostics: any[]): Promise<void> {
+    async pushDiagnostics(diagnostics: any[], clearRemote: boolean = true): Promise<void> {
         assert(this.dbName !== null);
         if (this.dbName === null) {
             return;
@@ -554,7 +554,13 @@ export class RemoteDB {
         const collection = db.collection(diagnosticsCollection);
 
         // Delete all diagnostics in remote DB
-        await this.deleteDiagnostics(db);
+        if (clearRemote) {
+            await this.deleteDiagnostics(db);
+        }
+        else {
+            let uuids = diagnostics.map((diagnostic: any) => diagnostic.id);
+            await this.deleteDiagnostics(db, uuids);
+        }
 
         if (diagnostics.length > 0) {
 
@@ -575,7 +581,7 @@ export class RemoteDB {
         await client.close();
     }
 
-    async syncDiagnostics(diagnostics: any[]): Promise<undefined | any[]> {
+    async syncDiagnostics(diagnostics: any[]): Promise<[undefined | any[], boolean]> {
         assert(this.isRemoteReady());
         let remoteDiagnostics: any[] = await this.getRemoteDiagnostics();
 
@@ -592,13 +598,46 @@ export class RemoteDB {
         }
         remoteAvgTimestamp /= remoteDiagnostics.length;
         // If the remote average timestamp is newer, then we need to sync
-        if (remoteAvgTimestamp >= avgTimestamp) {
-            return remoteDiagnostics;
+        const EPSILON = 0.5; // Half a second
+        if (remoteAvgTimestamp > avgTimestamp + EPSILON) {
+            return [remoteDiagnostics, true];
         }
-        else {
+        else if (remoteAvgTimestamp < avgTimestamp - EPSILON) {
             await this.pushDiagnostics(diagnostics);
-            return undefined;
+            return [undefined, true];
         }
+
+        // Sync flags only, based on flag_timestamp
+        // if remote flag_timestamp is greater than local flag_timestamp, pull remote flag
+        // if remote flag_timestamp is less than local flag_timestamp, push local flag
+        // Create map of local diagnostics based on UUID
+        let returnList = [];
+        let localDiagnosticsMap = new Map();
+        for (let i = 0; i < diagnostics.length; i++) {
+            localDiagnosticsMap.set(diagnostics[i].id, diagnostics[i]);
+        }
+        for (let i = 0; i < remoteDiagnostics.length; i++) {
+            let remoteDiagnostic = remoteDiagnostics[i];
+            let localDiagnostic = localDiagnosticsMap.get(remoteDiagnostic.id);
+            if (localDiagnostic === undefined) {
+                // Push remote diagnostic
+                await this.pushDiagnostics([remoteDiagnostic], false);
+            }
+            else {
+                // Pull remote diagnostic
+                if (remoteDiagnostic.flag_timestamp > localDiagnostic.flag_timestamp) {
+                    localDiagnostic.flag = remoteDiagnostic.flag;
+                    localDiagnostic.flag_timestamp = remoteDiagnostic.flag_timestamp;
+                    returnList.push(localDiagnostic);
+                }
+            }
+        }
+
+        if (returnList.length > 0) {
+            return [returnList, false];
+        }
+
+        return [undefined, false];
     }
 
     async areCredentialsStored(): Promise<boolean> {

@@ -84,7 +84,7 @@ export class LocalDB {
         stmt = await this.db.prepare('CREATE TABLE IF NOT EXISTS threads (id TEXT PRIMARY KEY, anchor TEXT, file_path TEXT, deleted INTEGER DEFAULT 0)');
         await stmt.run();
         await stmt.finalize();
-        stmt = await this.db.prepare('CREATE TABLE IF NOT EXISTS diagnostics (id TEXT PRIMARY KEY, diagnostic TEXT, anchor TEXT, file_path TEXT, timestamp_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
+        stmt = await this.db.prepare('CREATE TABLE IF NOT EXISTS diagnostics (id TEXT PRIMARY KEY, diagnostic TEXT, flag INTEGER, flag_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, anchor TEXT, file_path TEXT, timestamp_created DATETIME DEFAULT CURRENT_TIMESTAMP)');
         await stmt.run();
         await stmt.finalize();
     }
@@ -218,13 +218,13 @@ export class LocalDB {
         assert(this.db !== null, '[IaC LocalDB] db is null');
         if (this.db === null) { return []; }
 
-        let stmt = await this.db.prepare('SELECT id, diagnostic, anchor, file_path, timestamp_created FROM diagnostics');
+        let stmt = await this.db.prepare('SELECT id, diagnostic, flag, flag_timestamp, anchor, file_path, timestamp_created FROM diagnostics');
         let res = await stmt.all();
         await stmt.finalize();
         return res;
     }
 
-    async dbCreateOrReplaceDiagnosticWithId(uuid: string, diagnostic: string, anchor: string, filePath: string, lastModified: number | null = null): Promise<void> {
+    async dbCreateOrReplaceDiagnosticWithId(uuid: string, diagnostic: string, anchor: string, filePath: string, flag: number, lastModified: number | null = null): Promise<void> {
         assert(uuid !== null && uuid !== undefined, '[IaC LocalDB] uuid must be defined');
         assert(diagnostic !== null && diagnostic !== undefined, '[IaC LocalDB] diagnostic must be defined');
         assert(anchor !== null && anchor !== undefined, '[IaC LocalDB] anchor must be defined');
@@ -233,15 +233,26 @@ export class LocalDB {
         if (this.db === null) { return; }
         
         lastModified = lastModified === null ? (Date.now() / 1000) : lastModified;
-        let stmt = await this.db.prepare('INSERT OR REPLACE INTO diagnostics (id, diagnostic, anchor, file_path, timestamp_created) VALUES (?, ?, ?, ?, ?)');
+        let stmt = await this.db.prepare('INSERT OR REPLACE INTO diagnostics (id, diagnostic, flag, flag_timestamp, anchor, file_path, timestamp_created) VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)');
         console.log(`[IaC LocalDB] Binding sqlite parameters for diagnostic: ${uuid}, ${diagnostic}, ${anchor}, ${filePath}, ${lastModified}`);
-        await stmt.run(uuid, diagnostic, anchor, filePath, lastModified);
+        await stmt.run(uuid, diagnostic, flag, anchor, filePath, lastModified);
         await stmt.finalize();
     }
 
-    async dbCreateOrReplaceDiagnostic(diagnostic: string, anchor: string, filePath: string): Promise<string> {
+    async dbUpdateDiagnosticFlag(uuid: string, flag: number): Promise<void> {
+        assert(uuid !== null && uuid !== undefined, '[IaC LocalDB] uuid must be defined');
+        assert(flag !== null && flag !== undefined, '[IaC LocalDB] flag must be defined');
+        assert(this.db !== null, '[IaC LocalDB] db is null');
+        if (this.db === null) { return; }
+        
+        let stmt = await this.db.prepare('UPDATE diagnostics SET flag = ?, flag_timestamp = CURRENT_TIMESTAMP WHERE id = ?');
+        await stmt.run(flag, uuid);
+        await stmt.finalize();
+    }
+
+    async dbCreateOrReplaceDiagnostic(diagnostic: string, anchor: string, filePath: string, flag: number): Promise<string> {
         let uuid = util.genUUID();
-        await this.dbCreateOrReplaceDiagnosticWithId(uuid, diagnostic, anchor, filePath);
+        await this.dbCreateOrReplaceDiagnosticWithId(uuid, diagnostic, anchor, filePath, flag);
         return uuid;
     }
 }

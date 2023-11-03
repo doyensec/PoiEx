@@ -13,6 +13,11 @@ export const IAC_POI_MESSAGE = "IaC Point Of Intersection:";
 export const INFRAMAP_TIMEOUT_MS = 10 * 1000;
 export const INFRAMAP_DOWNLOADED_STATENAME = "inframapDownloading";
 
+export const FLAG_UNFLAGGED = 0;
+export const FLAG_FALSE = 1;
+export const FLAG_HOT = 2;
+export const FLAG_RESOLVED = 3;
+
 export const INFRAMAP_RELEASES: { [id: string] : any; } = {
     "linux": {
         "url": "https://github.com/cycloidio/inframap/releases/download/v0.6.7/inframap-linux-amd64.tar.gz",
