@@ -199,7 +199,7 @@
 			},
 			{
 				"view": "iacAudit",
-				"contents": "Please open a workspace folder to use this extension.",
+				"contents": "In order to use PoiEx open a workspace folder.\n[Open Folder](command:vscode.openFolder)",
 				"when": "workspaceFolderCount == 0"
 			},
 			{
@@ -214,7 +214,7 @@
 			},
 			{
 				"view": "iacProjectManager",
-				"contents": "Please open a workspace folder to use this extension.",
+				"contents": "In order to use PoiEx open a workspace folder.\n[Open Folder](command:vscode.openFolder)",
 				"when": "workspaceFolderCount == 0"
 			},
 			{
@@ -224,7 +224,7 @@
 			},
 			{
 				"view": "iacProjectManager",
-				"contents": "Initialize a new project on current Workspace.\n[Init project](command:poiex.initProject)\nOpen existing project from remote database.\n[Open existing project](command:poiex.openProject)",
+				"contents": "Initialize a new project on current Workspace.\n[Init project](command:poiex.initProject)\nOpen existing project from remote database.\n[Open existing project](command:poiex.openProject)\nDrop project database.\n[Destroy all projects](command:poiex.destroyAllProjects)",
 				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == false"
 			},
 			{

@@ -53,14 +53,14 @@ export class IaCProjectDir {
         )`);
     }
 
-    async listProjects(): Promise<{}[]> {
+    async listProjects(): Promise<any[]> {
         if (this.pdb === null) {
             return [];
         }
         let stmt = await this.pdb.prepare('SELECT uuid, name, keys FROM projects WHERE deleted = 0');
         let rows = await stmt.all({});
         await stmt.finalize();
-        return rows as {}[];
+        return rows as any[];
     }
 
     async pushProject(uuid: string, name: string, keys: string | null, jwt: string | null = null) {

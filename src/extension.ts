@@ -272,6 +272,21 @@ async function init1(context: vscode.ExtensionContext, iacPath: string) {
 			await cb();
 		}
 	}));
+
+	// Register command to destroy all projects and empty project database (destroyAllProjects)
+	context.subscriptions.push(vscode.commands.registerCommand(`${constants.EXT_NAME}.destroyAllProjects`, async () => {
+		console.log('[IaC Main] Destroy all projects button pressed');
+		vscode.window.showWarningMessage('Are you sure you want to destroy all projects (remove also on remote)?', 'Yes', 'No').then(async (choice) => {
+			if (choice === 'Yes') {
+				let plist = await pdb.listProjects();
+				if (plist === null) { return; }
+				for (let project of plist) {
+					let projectUuid = project.uuid;
+					await pdb.removeProject(projectUuid, rdb);
+				}
+			}
+		});
+	}));	
 }
 
 async function openProject(context: vscode.ExtensionContext, storageUri: vscode.Uri, projectUuid: string, projectSecret: string | null = null) {
