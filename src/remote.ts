@@ -675,6 +675,10 @@ export class RemoteDB {
         }
         catch (e) {
             // Show error to the user
+            if ((e as Error).message.includes("Authentication failed")) {
+                vscode.window.showErrorMessage('MongoDB authfail error: ' + (e as Error).message);
+                return 0;
+            }
             vscode.window.showErrorMessage('MongoDB connection error: ' + (e as Error).message);
             return -1;
         }
