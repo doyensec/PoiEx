@@ -497,15 +497,29 @@ export class IaCComments {
                 console.log("[IaC Comments] Comment: " + object.tid);
                 return;
             }
+
             // Get comment
             let comment = thread.comments.find(c => (c as NoteComment).id === object.cid);
             if (comment === undefined) {
                 // Create new comment
                 if (this.disposed) { return; }
                 await this.createComment(object.comment, thread, object.userCreated, object.cid, object.timestampModified);
+
                 // Notify user
                 let relPath = util.absPathToRel(thread.uri.fsPath);
-                vscode.window.showInformationMessage(`[${object.userCreated}] 📥 Added a comment on ${relPath}`);
+
+                // Show a notification with a "Jump to comment" button
+                const showCommentAction = 'Show comment';
+                vscode.window.showInformationMessage(`[${object.userCreated}] 📥 Added a comment on ${relPath}`, showCommentAction).then(
+                    (selection) => {
+                        if ((selection === showCommentAction) && (thread !== undefined)) {
+                            // Jump to comment
+                            vscode.window.showTextDocument(thread.uri).then((editor) => {
+                                editor.revealRange((thread as OurThread).range, vscode.TextEditorRevealType.InCenter);
+                            });
+                        }
+                    }
+                );
             }
             else {
                 // Update existing comment
@@ -519,7 +533,19 @@ export class IaCComments {
 
                     // Notify user
                     let relPath = util.absPathToRel(thread.uri.fsPath);
-                    vscode.window.showInformationMessage(`[${object.userCreated}] ✍️ Updated a comment on ${relPath}`);
+
+                    // Show a notification with a "Jump to comment" button
+                    const showCommentAction = 'Show comment';
+                    vscode.window.showInformationMessage(`[${object.userCreated}] ✍️ Updated a comment on ${relPath}`, showCommentAction).then(
+                        (selection) => {
+                            if ((selection === showCommentAction) && (thread !== undefined)) {
+                                // Jump to comment
+                                vscode.window.showTextDocument(thread.uri).then((editor) => {
+                                    editor.revealRange((thread as OurThread).range, vscode.TextEditorRevealType.InCenter);
+                                });
+                            }
+                        }
+                    );
                 }
             }
         }
