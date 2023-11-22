@@ -12,6 +12,9 @@ export const DIAGNOSTICS_CODENAME = 'poiex';
 export const IAC_POI_MESSAGE = "IaC Point Of Intersection:";
 export const INFRAMAP_TIMEOUT_MS = 10 * 1000;
 export const INFRAMAP_DOWNLOADED_STATENAME = "inframapDownloading";
+export const PROJECT_TREE_VIEW_TITLE = "PoiEx: Project List";
+export const PROJECT_TREE_VIEW_NO_PROJECTS_MESSAGE = "No projects found.";
+export const PROJECT_TREE_VIEW_DB_ERROR_MESSAGE = "Invalid DB configuration.";
 
 export const FLAG_UNFLAGGED = 0;
 export const FLAG_FALSE = 1;

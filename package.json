@@ -69,6 +69,22 @@
 			{
 				"command": "poiex.dispose",
 				"title": "Remove All Notes (DANGER)"
+			},
+			{
+				"command": "iacAudit.refreshProjectTree",
+				"title": "Refresh",
+				"icon": {
+					"light": "media/refresh-dark.svg",
+					"dark": "media/refresh-light.svg"
+				}
+			},
+			{
+				"command": "iacAudit.deleteTreeProject",
+				"title": "Delete project",
+				"icon": {
+					"light": "media/remove-dark.svg",
+					"dark": "media/remove-light.svg"
+				}
 			}
 		],
 		"configuration": {
@@ -160,6 +176,20 @@
 					"command": "poiex.saveNote",
 					"group": "inline@2",
 					"when": "commentController == poiex"
+				}
+			],
+			"view/title": [
+				{
+					"command": "iacAudit.refreshProjectTree",
+					"when": "view == iacAudit && workspaceFolderCount > 0 && iacAudit.isProjectOpen == false",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "iacAudit.deleteTreeProject",
+					"when": "view == iacAudit && workspaceFolderCount > 0 && iacAudit.isProjectOpen == false",
+					"group": "inline"
 				}
 			]
 		},

@@ -13,6 +13,7 @@ import { LocalDB } from './db';
 import { RemoteDB } from './remote';
 import * as comments from './comments';
 import { IaCEncryption } from './encryption';
+import * as tree from './tree';
 
 let db: LocalDB;
 let rdb: RemoteDB;
@@ -20,6 +21,7 @@ let mComments: comments.IaCComments;
 let pdb: IaCProjectDir;
 let projectDisposables: vscode.Disposable[] = [];
 let projectClosing: boolean = false;
+let projectTreeView: tree.ProjectTreeViewManager;
 
 export async function initLocalDb(dbDir: string, projectUuid: string) {
 	// Create sqlite3 database in storage directory
@@ -212,18 +214,57 @@ async function init1(context: vscode.ExtensionContext, iacPath: string) {
 	}));
 
 	// Register command to open an existing project
-	context.subscriptions.push(vscode.commands.registerCommand(`${constants.EXT_NAME}.openProject`, async () => {
+	context.subscriptions.push(vscode.commands.registerCommand(`${constants.EXT_NAME}.openProject`, async (projectUuid: string | undefined = undefined) => {
 		console.log('[IaC Main] Open project button pressed');
 		if (!ensureDbOk()) {
 			console.log('[IaC Main] Remote database not configured, cannot open project');
 			return;
 		}
 
+		let cb2 = async (choice: string | undefined) => {
+			if (choice === undefined) {
+				return;
+			}
+			let projectUuid = choice;
+			if (choice.includes(' $ ')) {
+				projectUuid = choice.split(' $ ')[1];
+			}
+			let project = await pdb.getProject(projectUuid);
+			assert(project !== null, "Project not found in local database");
+			if (project === null) { return; };
+			if (project[3] === null || project[2] !== null) {
+				openProject(context, iacUri, projectUuid);
+				return;
+			}
+			// Ask for project secret
+			vscode.window.showInputBox({
+				placeHolder: 'Please enter project secret',
+				prompt: 'Please enter project secret',
+				password: true,
+				validateInput: (value: string) => {
+					if (value === undefined || value === '') {
+						return 'Project secret cannot be empty';
+					}
+					return undefined;
+				}
+			}).then((projectSecret) => {
+				if (projectSecret === undefined) {
+					return;
+				}
+				openProject(context, iacUri, projectUuid, projectSecret);
+			});
+		};
+
 		let cb = async () => {
 			console.log('[IaC Main] Open project ready, executing callback');
+			if (projectUuid !== undefined) {
+				cb2(projectUuid);
+				return;
+			}
 
 			// Show list of projects as quickpick
 			let projectList = (await pdb.listProjects()) as {}[];
+			projectTreeView.update(projectList);
 			let projectNames = projectList.map((project: any) => project.name + " $ " + project.uuid);
 			console.log('[IaC Main] Open project got list of projects');
 			if (projectNames.length === 0) {
@@ -233,36 +274,7 @@ async function init1(context: vscode.ExtensionContext, iacPath: string) {
 
 			vscode.window.showQuickPick(projectNames, {
 				placeHolder: 'Please select a project to open'
-			}).then(async (choice) => {
-				if (choice === undefined) {
-					return;
-				}
-				let projectUuid = choice.split(' $ ')[1];
-				let project = await pdb.getProject(projectUuid);
-				assert(project !== null, "Project not found in local database");
-				if (project === null) { return; };
-				if (project[3] === null || project[2] !== null) {
-					openProject(context, iacUri, projectUuid);
-					return;
-				}
-				// Ask for project secret
-				vscode.window.showInputBox({
-					placeHolder: 'Please enter project secret',
-					prompt: 'Please enter project secret',
-					password: true,
-					validateInput: (value: string) => {
-						if (value === undefined || value === '') {
-							return 'Project secret cannot be empty';
-						}
-						return undefined;
-					}
-				}).then((projectSecret) => {
-					if (projectSecret === undefined) {
-						return;
-					}
-					openProject(context, iacUri, projectUuid, projectSecret);
-				});
-			});
+			}).then(cb2);
 		};
 
 		if (rdb.settingsEnabled()) {
@@ -284,9 +296,24 @@ async function init1(context: vscode.ExtensionContext, iacPath: string) {
 					let projectUuid = project.uuid;
 					await pdb.removeProject(projectUuid, rdb);
 				}
+				projectTreeView.update();
 			}
 		});
-	}));	
+	}));
+
+	// Experimental tree view
+	if (ensureDbOk()) {
+		projectTreeView = new tree.ProjectTreeViewManager(context, pdb, rdb);
+		context.subscriptions.push(projectTreeView);
+		projectTreeView.show();
+		projectTreeView.update();
+	}
+	else {
+		projectTreeView = new tree.ProjectTreeViewManager(context, pdb, undefined);
+		context.subscriptions.push(projectTreeView);
+		projectTreeView.showDbError();
+		console.log('[IaC Main] Remote database not configured, cannot show project list');
+	}
 }
 
 async function openProject(context: vscode.ExtensionContext, storageUri: vscode.Uri, projectUuid: string, projectSecret: string | null = null) {
@@ -324,6 +351,9 @@ async function openProject(context: vscode.ExtensionContext, storageUri: vscode.
 	vscode.commands.executeCommand('setContext', 'iacAudit.isProjectOpen', true);
 	vscode.commands.executeCommand('setContext', 'iacAudit.isProjectCreator', true);
 	vscode.commands.executeCommand('setContext', 'iacAudit.isProjectEncrypted', projectSecret !== null);
+
+	// Hide project tree view
+	projectTreeView.hide();
 
 	rdb.setProjectUuid(projectUuid, projectSecret);
 
@@ -415,8 +445,8 @@ async function closeProject(context: vscode.ExtensionContext, projectUuid: strin
 	}
 	projectClosing = true;
 
+	await mComments.dispose();
 	mIacWebviewManager.dispose();
-	mComments.dispose();
 	mIaCDiagnostics.dispose();
 	
 	// Dispose all project disposables
@@ -438,6 +468,11 @@ async function closeProject(context: vscode.ExtensionContext, projectUuid: strin
 	vscode.commands.executeCommand('setContext', 'iacAudit.isProjectOpen', false);
 	vscode.commands.executeCommand('setContext', 'iacAudit.isProjectCreator', false);
 	vscode.commands.executeCommand('setContext', 'iacAudit.isProjectEncrypted', false);
+
+	// Show project tree view
+	projectTreeView.show().then(() => {
+		projectTreeView.update();
+	});
 
 	// Race condition prevention
 	projectClosing = false;	

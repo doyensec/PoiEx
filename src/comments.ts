@@ -613,11 +613,11 @@ export class IaCComments {
         }
     }
 
-    dispose() {
-        this.disposables.forEach((disposable) => {
+    async dispose() {
+        for (const disposable of this.disposables) {
             this.context.subscriptions.splice(this.context.subscriptions.indexOf(disposable), 1);
-            disposable.dispose();
-        });
+            await disposable.dispose();
+        }
         this.disposed = true;
     }
 }
