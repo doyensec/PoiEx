@@ -254,7 +254,7 @@
 			},
 			{
 				"view": "iacProjectManager",
-				"contents": "Initialize a new project on current Workspace.\n[Init project](command:poiex.initProject)\nOpen existing project from remote database.\n[Open existing project](command:poiex.openProject)\nDrop project database.\n[Destroy all projects](command:poiex.destroyAllProjects)",
+				"contents": "Initialize a new project on current Workspace.\n[Init project](command:poiex.initProject)\nOpen existing project from remote database.\n[Open existing project](command:poiex.openProject)",
 				"when": "workspaceFolderCount == 1 && iacAudit.isProjectOpen == false"
 			},
 			{
