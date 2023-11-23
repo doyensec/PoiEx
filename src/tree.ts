@@ -52,8 +52,12 @@ export class ProjectTreeViewManager {
 
         this._disposables.push(vscode.commands.registerCommand('iacAudit.deleteTreeProject', async (project: ProjectItem) => {
             console.log(`[IaC Tree] Deleting project ${project.uuid}`);
-            await this.pdb.removeProject(project.uuid, rdb);
-            await this.update();
+            vscode.window.showWarningMessage('Are you sure you want to destroy the selected project (remove also on remote)?', 'Yes', 'No').then(async (choice) => {
+                if (choice === 'Yes') {
+                    await this.pdb.removeProject(project.uuid, rdb);
+                    await this.update();
+                }
+            });
         }));
     }
 
