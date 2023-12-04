@@ -81,7 +81,7 @@ export async function runSemgrep(context: vscode.ExtensionContext, path: string,
     }
     catch (error: any) {
         console.log(`[IaC Semgrep] error: ${error.message}`);
-        let timeoutFormatted = (SEMGREP_TIMEOUT_MS / 1000).toFixed(2);
+        let timeoutFormatted = semgrepTimeout.toFixed(2);
         let msg = `Semgrep timeout (${timeoutFormatted}s) exceeded or execution error. Error: ${error.message}`;
         vscode.window.showErrorMessage(msg);
     }
