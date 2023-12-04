@@ -253,7 +253,7 @@ export class IaCComments {
         thread.comments = thread.comments.filter(cmt => (cmt as NoteComment).id !== commentId);
 
         // Update global thread list
-        await this.updateThreadInLocalDb(thread);
+        await this.updateThreadInLocalDb(thread, false, true);
 
         if (thread.comments.length === 0) {
             // Delete from global thread list
@@ -315,7 +315,7 @@ export class IaCComments {
         });
     }
 
-    async updateThreadInLocalDb(thread: vscode.CommentThread, deleteEmptyThreads: boolean = true) {
+    async updateThreadInLocalDb(thread: vscode.CommentThread, deleteEmptyThreads: boolean = true, processDeletions: boolean = false) {
         // Add thread to global list
         console.log("[IaC Comments] Updating thread in local db");
         if (!this.threadIdMap.has(thread)) {
@@ -357,10 +357,14 @@ export class IaCComments {
             console.log("[IaC Comments] Inserting comment " + oComment.body + " by " + oComment.author.name + " into thread " + tid);
         }
 
+        if (!processDeletions) {
+            return;
+        }
+
         // Get a list of all comment ids in the thread from the database
         let commentIds: string[] = await this.db.getCommentsForThread(tid);
         // Filter only comment ids that are not in the thread.
-        let newCommentIds = thread.comments.filter(comment => !commentIds.includes((comment as NoteComment).id)).map(comment => (comment as NoteComment).id);
+        let newCommentIds = commentIds.filter(cid => !thread.comments.map(comment => (comment as NoteComment).id).includes(cid));
         
         // Delete comments that are not in the thread
         if (newCommentIds.length > 0) {
