@@ -35,14 +35,14 @@ function updateStatusBar(rdb: RemoteDB, remoteStatus: vscode.StatusBarItem) {
 	remoteStatus.command = `${constants.EXT_NAME}.statusBarButton`;
 	if (rdb.settingsEnabledAndConfigured()) {
 		let dbName = rdb.getDbName();
-		remoteStatus.text = `$(compass-dot) Remote DB: $(ellipsis) (${dbName})`;
+		remoteStatus.text = `$(compass-dot) PoiEx sync: $(ellipsis) Connecting (${dbName})`;
 		if (rdb.isRemoteReady()) {
-			remoteStatus.text = `$(compass-active) Remote DB: $(arrow-swap) (${dbName})`;
+			remoteStatus.text = `$(compass-active) PoiEx sync: $(arrow-swap) Connected (${dbName})`;
 		}
 		remoteStatus.tooltip = 'Click to disable remote database';
 	}
 	else {
-		remoteStatus.text = '$(compass) Remote DB: $(circle-slash)';
+		remoteStatus.text = '$(compass) PoiEx sync: $(circle-slash) Disabled';
 		remoteStatus.tooltip = 'Click to enable remote database';
 	}
 	remoteStatus.show();
