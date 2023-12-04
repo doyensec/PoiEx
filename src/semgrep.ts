@@ -67,7 +67,7 @@ export async function runSemgrep(context: vscode.ExtensionContext, path: string,
 
     let execFile = util.promisify(child_process.execFile);
     try {
-        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: semgrepTimeout * 1000, cwd: path, maxBuffer: 1024 * 1024 * 2 });
+        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: semgrepTimeout * 1000, cwd: path, maxBuffer: constants.SEMGREP_MAX_BUFFER });
         if (stderr) {
             console.log(`[IaC Semgrep] stderr: ${stderr}`);
             vscode.window.showErrorMessage(`Semgrep error: ${stderr}`);
@@ -109,7 +109,7 @@ export async function runSemgrepHcl(context: vscode.ExtensionContext, wspath: st
     let execFile = util.promisify(child_process.execFile);
 
     try {
-        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: SEMGREP_TIMEOUT_MS, cwd: wspath, maxBuffer: 1024 * 1024 * 2 });
+        let {stderr, stdout} = await execFile(semgrepPath, semgrepArgsArray, { timeout: SEMGREP_TIMEOUT_MS, cwd: wspath, maxBuffer: constants.SEMGREP_MAX_BUFFER });
         if (stderr) {
             console.log(`[IaC Semgrep] stderr: ${stderr}`);
             vscode.window.showErrorMessage(`Semgrep error: ${stderr}`);

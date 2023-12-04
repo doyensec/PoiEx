@@ -1,6 +1,7 @@
 export const EXT_COMMON_NAME = "PoiEx";
 export const EXT_NAME = "poiex";
 export const SEMGREP_TIMEOUT_MS = 240 * 1000; // Semgrep timeout to be used when scanning HCL files
+export const SEMGREP_MAX_BUFFER = 1024 * 1024 * 20; // 20MB
 export const REMOTEDB_INIT_TIMEOUT_MS = 10 * 1000;
 export const RW_CHECK_COLLECTION = "readWriteCheckCollection";
 export const PROJECT_DIR_COLLECTION = "projectDir";
