@@ -45,7 +45,11 @@ PoiEx allows users to:
 A custom set of semgrep rules has been developed. Each pair of language and Cloud Service Provider (CSP) needs a different ruleset, as a rule is generally able to match only one language and one CSP. 
 
 The table below summarizes the currently supported CSPs and languages
-![[images/supported-lang-csp.png]]
+</br>
+<p align="center">
+    <img src="images/supported-lang-csp.png" width="30%">
+</p>
+</br>
 
 ### Enhancing Reviews With PoIEx
 Non-IaC related features were added to support manual reviews in different ways. Such functionalities are unrelated to the cloud infrastructure analysis and they are usable in any code review activity.<br>
@@ -57,7 +61,7 @@ It is also possible to flag the findings as `false positive`,`hot` or `resolved`
 ![Semgrep integration](images/feature-findings.png)
 
 #### 2. Notes taking
-It is possible to start comment threads directly within the codebase to add details and reactions.
+It is possible to start comment threads directly within the codebase to add details and reactions.<br>
 
 ![[images/threadExample.png]]
 
