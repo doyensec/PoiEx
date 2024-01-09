@@ -17,7 +17,7 @@
 		}
 	],
 	"engines": {
-		"vscode": "^1.76.0"
+		"vscode": "^1.85.0"
 	},
 	"categories": [
 		"Other"
@@ -284,33 +284,33 @@
 	},
 	"devDependencies": {
 		"@types/glob": "^8.1.0",
-		"@types/mocha": "^10.0.1",
-		"@types/node": "16.x",
-		"@types/vscode": "^1.76.0",
-		"@typescript-eslint/eslint-plugin": "^5.53.0",
-		"@typescript-eslint/parser": "^5.53.0",
-		"@vscode/test-electron": "^2.2.3",
-		"@vscode/vsce": "^2.19.0",
-		"electron": "^26.0.0",
+		"@types/mocha": "^10.0.6",
+		"@types/node": "^16.18.70",
+		"@types/vscode": "^1.85.0",
+		"@typescript-eslint/eslint-plugin": "^5.62.0",
+		"@typescript-eslint/parser": "^5.62.0",
+		"@vscode/test-electron": "^2.3.8",
+		"@vscode/vsce": "^2.22.0",
+		"electron": "^26.6.4",
 		"electron-rebuild": "^3.2.9",
-		"eslint": "^8.34.0",
+		"eslint": "^8.56.0",
 		"glob": "^8.1.0",
 		"mocha": "^10.2.0",
 		"typescript": "^4.9.5"
 	},
 	"dependencies": {
 		"@microsoft/vscode-file-downloader-api": "^1.0.1",
-		"@types/sqlite3": "^3.1.8",
-		"@types/ssri": "^7.1.1",
-		"@types/tar": "^6.1.5",
-		"@types/url-parse": "^1.4.8",
-		"@types/which": "^3.0.0",
-		"jose": "^4.14.4",
-		"mongodb": "^5.2.0",
+		"@types/sqlite3": "^3.1.11",
+		"@types/ssri": "^7.1.5",
+		"@types/tar": "^6.1.10",
+		"@types/url-parse": "^1.4.11",
+		"@types/which": "^3.0.3",
+		"jose": "^4.15.4",
+		"mongodb": "^5.9.2",
 		"sqlite": "^4.2.1",
-		"sqlite3": "^5.1.6",
-		"ssri": "^10.0.4",
-		"tar": "^6.1.15",
+		"sqlite3": "=5.1.6",
+		"ssri": "^10.0.5",
+		"tar": "^6.2.0",
 		"url-parse": "^1.5.10",
 		"which": "^3.0.1"
 	},
