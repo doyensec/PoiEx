@@ -84,4 +84,4 @@ PoiEx allows for real-time synchronization of findings and comments with other u
 
 This project was made with love in the [Doyensec Research island](https://doyensec.com/research.html) by [Michele Lizzit](https://www.linkedin.com/in/michelelizzit/) for his master thesis at ETH Zurich under the mentoring of [Francesco Lacerenza](https://twitter.com/lacerenza_fra).
 
-Download the last [realease](https://github.com/doyensec/PoiEx/releases) and contribute with a star, [bug reports or suggestions](https://github.com/doyensec/PoiEx/issues).
+Download the last [release](https://github.com/doyensec/PoiEx/releases) and contribute with a star, [bug reports or suggestions](https://github.com/doyensec/PoiEx/issues).
