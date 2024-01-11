@@ -86,4 +86,4 @@ This project was made with love on the [Doyensec Research Island](https://doyen
 
 Download the latest [release](https://github.com/doyensec/PoiEx/releases) and contribute with a star, [bug reports or suggestions](https://github.com/doyensec/PoiEx/issues).
 
-![Doyensec Research](images/doyensec_logo.svg)
+<img src='images/doyensec_logo.png' height='40px' alt='Doyensec Research'>
