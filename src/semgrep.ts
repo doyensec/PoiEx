@@ -102,6 +102,10 @@ export async function runSemgrepHcl(context: vscode.ExtensionContext, wspath: st
     iacpath = path.relative(wspath, iacpath);
     console.log(`[IaC Semgrep] Semgrep CWD: ${iacpath}`);
 
+    if (iacpath.trim() === "") {
+        iacpath = "./";
+    }
+
     let semgrepArgsArray: string[] = ["--config", context.asAbsolutePath("tfparse_rules/")];
     semgrepArgsArray = ["--no-git-ignore", "--json", "--quiet"].concat(semgrepArgsArray).concat([iacpath]);
     console.log(`[IaC Semgrep] Running Semgrep with args: ${semgrepArgsArray}`);
