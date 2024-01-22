@@ -44,12 +44,15 @@ PoiEx allows users to:
 
 A custom set of Semgrep rules has been developed. Each pair of language and Cloud Service Provider (CSP) needs a different ruleset, as a rule is generally able to match only one language and one CSP. 
 
-The table below summarizes the currently supported CSPs and languages
-</br>
-<p align="center">
-    <img src="images/supported-lang-csp.png" width="30%">
-</p>
-</br>
+The table below summarizes the currently supported CSPs and languages:
+
+| Language/CSP   | GCP | AWS |
+|-----------------|-----|-----|
+| Python          | Yes | Yes |
+| JavaScript      | Yes | Yes |
+| Go              | No  | Yes |
+| TypeScript     | No  | Yes |
+
 
 ### Enhancing Reviews with PoiEx
 Non-IaC related features were added to support manual reviews in different ways. Such functionalities are unrelated to the cloud infrastructure analysis and they are usable in any code review activity.<br>

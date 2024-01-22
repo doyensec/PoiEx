@@ -76,4 +76,5 @@ After deployment create additional user(s) for the extension collaborators. Each
 
 Since the tool is intended for internal usage, currently the MongoDB users (testers) are required to have read and write permissions on the configured database. <br>
 Consequently, everyone in the team can list, add or destroy projects. <br>
-As previously described, per-project symmetric encryption keys are created and they must be shared among peers participating in an activity, in order to decrypt and read the stored data. In this way the confidentiality is project-oriented.
+PoiEx stores the comment content and anchor as encrypted JSON objects as per the RFC7516 specification, using the AES-128-CBC algorithm.  
+The key is never stored on the remote database and needs to be manually shared by the user to all collaborators via a safe channel.
