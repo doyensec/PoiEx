@@ -12,7 +12,7 @@ Since it was designed to simplify manual code review activities, it was also pac
 </p>
 </br>
 
-Read the launch post on the [Doyensec blog](https://blog.doyensec.com/2024/01/25/poiex-release.html) for practical examples and tips.
+Read the launch post on the [Doyensec blog](https://blog.doyensec.com/2024/01/30/poiex-release.html) for practical examples and tips.
 
 ## Try It Out!
 
