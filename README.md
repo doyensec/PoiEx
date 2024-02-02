@@ -87,6 +87,8 @@ PoiEx allows for real-time synchronization of findings and comments with other u
 
 This project was made with love on the [Doyensec Research Island](https://doyensec.com/research.html) by [Michele Lizzit](https://www.linkedin.com/in/michelelizzit/) for his master's thesis at ETH Zurich, under the mentoring of [Francesco Lacerenza](https://twitter.com/lacerenza_fra).
 
+We took inspiration from [vscode-security-notes](https://github.com/RefactorSecurity/vscode-security-notes) by RefactorSecurity.
+
 Download the latest [release](https://github.com/doyensec/PoiEx/releases) and contribute with a star, [bug reports or suggestions](https://github.com/doyensec/PoiEx/issues).
 
 <img src='images/doyensec_logo.png' height='40px' alt='Doyensec Research'>
